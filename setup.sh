@@ -86,7 +86,8 @@ system_setup() {
         # Coding agents (T3 Code comes from the AUR, Claude Code from its installer, both below)
         openai-codex
         # Development
-        azure-cli dotnet-sdk-10.0 nvm
+        # The ASP.NET packages are separate on Arch; without them, web projects fail with NETSDK1226.
+        azure-cli dotnet-sdk-10.0 aspnet-targeting-pack-10.0 aspnet-runtime-10.0 nvm
         # Gaming. lib32-vulkan-intel is named here, or --noconfirm would pick the NVIDIA driver for Steam.
         # flatpak is for GeForce NOW, installed in part 2.
         steam lib32-vulkan-intel flatpak
