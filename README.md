@@ -45,13 +45,25 @@ sudo reboot
 
 It asks for your sudo password. It then:
 
-- updates the system
+- sets up Snapper snapshots of `/`, with automatic cleanup of old ones
+- updates the system and installs `pacman-contrib` and `fwupd`
+- enables timers for SSD TRIM, pacman cache cleanup and a monthly btrfs scrub
+- sets the full name on your user account
 - installs paru and Google Chrome
 - copies the niri and SSH config
 - enables the SSH agent
 - sets up the Noctalia login screen, which unlocks the keyring
 
 After the reboot you get the Noctalia login screen. Keep your keyring password the same as your login password. Your SSH key passphrases are saved in the keyring the first time you use each key.
+
+## Firmware updates
+
+Framework publishes BIOS and other firmware updates through fwupd. To check for and install them:
+
+```sh
+fwupdmgr refresh
+fwupdmgr update
+```
 
 ## If something breaks
 

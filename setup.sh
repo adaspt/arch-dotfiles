@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# Sets up niri, Noctalia, the login screen, Chrome and the SSH agent after archinstall.
-# Run it as your normal user from a TTY after the first boot:
+# Sets up snapshots, maintenance timers, niri, Noctalia, the login screen, Chrome and the SSH agent
+# after archinstall. Run it as your normal user from a TTY after the first boot:
 #   curl -fsSL https://raw.githubusercontent.com/adaspt/arch-dotfiles/main/setup.sh | bash
 set -euo pipefail
 
+FULL_NAME="Adas Petrovas"
 REPO_URL=https://github.com/adaspt/arch-dotfiles.git
 REPO_DIR=$(mktemp -d)
 trap 'rm -rf "$REPO_DIR"' EXIT
@@ -20,8 +21,25 @@ main() {
     echo "==> Copying system config (greetd, PAM keyring unlock)"
     sudo cp -r "$REPO_DIR/repo/config/etc/." /etc/
 
+    # archinstall installs snapper and snap-pac but creates no config, so snap-pac takes no snapshots.
+    # This runs before the update below so that the update is the first thing snapshotted.
+    echo "==> Setting up Snapper snapshots of /"
+    if [[ ! -f /etc/snapper/configs/root ]]; then
+        sudo snapper -c root create-config /
+    fi
+    sudo systemctl enable --now snapper-cleanup.timer
+
     echo "==> Updating the system"
-    sudo pacman -Syu --noconfirm
+    sudo pacman -Syu --needed --noconfirm pacman-contrib fwupd
+
+    # fstrim: btrfs already trims with discard=async, but this also covers the FAT32 /boot.
+    # paccache: keeps the last 3 versions of each package in the pacman cache.
+    # btrfs-scrub@-: checks the root filesystem for corruption once a month.
+    echo "==> Enabling maintenance timers"
+    sudo systemctl enable --now fstrim.timer paccache.timer btrfs-scrub@-.timer
+
+    echo "==> Setting your full name"
+    sudo chfn -f "$FULL_NAME" "$USER"
 
     echo "==> Installing paru and Google Chrome"
     if ! command -v paru >/dev/null; then
