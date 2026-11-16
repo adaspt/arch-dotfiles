@@ -19,6 +19,9 @@ input {
             // If this section is empty, niri will fetch xkb settings
             // from org.freedesktop.locale1. You can control these using
             // localectl set-x11-keymap.
+
+            // US and Lithuanian, switched with Mod+Shift+Space (see binds)
+            layout "us,lt"
         }
 
         // Enable numlock on startup, omitting this setting disables it.
@@ -613,6 +616,9 @@ binds {
     // since it will switch twice upon pressing the hotkey (once by xkb, once by niri).
     // Mod+Space       { switch-layout "next"; }
     // Mod+Shift+Space { switch-layout "prev"; }
+
+    // Mod+Space is the Noctalia launcher, so the layout switch (us/lt) is here
+    Mod+Shift+Space hotkey-overlay-title="Switch Keyboard Layout" { switch-layout "next"; }
 
     Print { screenshot; }
     // Same as Print, for keyboards without a Print key
