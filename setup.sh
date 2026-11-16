@@ -2,12 +2,12 @@
 # Sets up snapshots, maintenance timers, niri, Noctalia, the login screen, Chrome and the SSH agent
 # after archinstall. Run it as your normal user from a TTY after the first boot:
 #   curl -fsSL https://raw.githubusercontent.com/adaspt/arch-dotfiles/main/setup.sh | bash
+# Safe to run again, also from the clone: ~/Projects/personal/arch-dotfiles/setup.sh
 set -euo pipefail
 
 FULL_NAME="Adas Petrovas"
 REPO_URL=https://github.com/adaspt/arch-dotfiles.git
-REPO_DIR=$(mktemp -d)
-trap 'rm -rf "$REPO_DIR"' EXIT
+REPO_DIR="$HOME/Projects/personal/arch-dotfiles"
 
 # Everything runs inside main, so bash has read the whole script from the pipe before running any of it.
 main() {
@@ -16,10 +16,16 @@ main() {
         exit 1
     fi
 
-    git clone --depth 1 "$REPO_URL" "$REPO_DIR/repo"
+    # An existing clone is left as it is, local changes included
+    if [[ ! -d "$REPO_DIR/.git" ]]; then
+        echo "==> Cloning this repo to $REPO_DIR"
+        mkdir -p "$(dirname "$REPO_DIR")"
+        git clone "$REPO_URL" "$REPO_DIR"
+    fi
 
+    # Copied, not linked: files in /etc have to be owned by root
     echo "==> Copying system config (greetd, PAM keyring unlock)"
-    sudo cp -r "$REPO_DIR/repo/config/etc/." /etc/
+    sudo cp -r "$REPO_DIR/config/etc/." /etc/
 
     # archinstall installs snapper and snap-pac but creates no config, so snap-pac takes no snapshots.
     # This runs before the update below so that the update is the first thing snapshotted.
@@ -43,13 +49,23 @@ main() {
 
     echo "==> Installing paru and Google Chrome"
     if ! command -v paru >/dev/null; then
-        git clone https://aur.archlinux.org/paru-bin.git "$REPO_DIR/paru-bin"
-        (cd "$REPO_DIR/paru-bin" && makepkg -si --noconfirm)
+        local build_dir
+        build_dir=$(mktemp -d)
+        git clone https://aur.archlinux.org/paru-bin.git "$build_dir"
+        (cd "$build_dir" && makepkg -si --noconfirm)
+        rm -rf "$build_dir"
     fi
     paru -S --needed --noconfirm --skipreview google-chrome
 
-    echo "==> Copying niri and SSH config"
-    cp -r "$REPO_DIR/repo/config/home/." "$HOME/"
+    # Symlinked, so editing ~/.config/niri/config.kdl edits the file in the repo.
+    # Each file is linked on its own, so ~/.config and ~/.ssh keep everything else in them.
+    echo "==> Linking niri and SSH config into ~"
+    local file rel
+    while IFS= read -r -d '' file; do
+        rel=${file#"$REPO_DIR/config/home/"}
+        mkdir -p "$(dirname "$HOME/$rel")"
+        ln -sfn "$file" "$HOME/$rel"
+    done < <(find "$REPO_DIR/config/home" -type f -print0)
     chmod 700 "$HOME/.ssh"
     niri validate
 

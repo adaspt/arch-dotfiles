@@ -4,7 +4,8 @@ Arch Linux with niri and Noctalia on a Framework laptop (Intel).
 
 - `archinstall.json`: the archinstall config
 - `setup.sh`: everything after the first boot
-- `config/etc/`, `config/home/`: files that `setup.sh` copies to `/etc` and `~`
+- `config/etc/`: files that `setup.sh` copies to `/etc`
+- `config/home/`: files that `setup.sh` symlinks into `~`, so editing them in `~` edits the repo
 
 ## 1. Connect to Wi-Fi on the install USB
 
@@ -45,16 +46,19 @@ sudo reboot
 
 It asks for your sudo password. It then:
 
+- clones this repo to `~/Projects/personal/arch-dotfiles`
 - sets up Snapper snapshots of `/`, with automatic cleanup of old ones
 - updates the system and installs `pacman-contrib` and `fwupd`
 - enables timers for SSD TRIM, pacman cache cleanup and a monthly btrfs scrub
 - sets the full name on your user account
 - installs paru and Google Chrome
-- copies the niri and SSH config
+- links the niri and SSH config into `~`
 - enables the SSH agent
 - sets up the Noctalia login screen, which unlocks the keyring
 
 After the reboot you get the Noctalia login screen. Keep your keyring password the same as your login password. Your SSH key passphrases are saved in the keyring the first time you use each key.
+
+The script is safe to run again. After changing a file in `config/etc/`, run `~/Projects/personal/arch-dotfiles/setup.sh` to copy it to `/etc`.
 
 ## Firmware updates
 
