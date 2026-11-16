@@ -21,13 +21,17 @@ If your device isn't `wlan0`, `iwctl device list` shows its name.
 
 ## 2. Run archinstall
 
-```sh
-archinstall --config-url https://raw.githubusercontent.com/adaspt/arch-dotfiles/main/archinstall.json
-```
+1. Start archinstall with the config:
 
-archinstall asks for anything the config doesn't cover. Under **Authentication**, add one user and mark it as superuser (sudo).
+   ```sh
+   archinstall --config-url https://raw.githubusercontent.com/adaspt/arch-dotfiles/main/archinstall.json
+   ```
 
-Check the summary before you choose **Install**: the disk section **wipes `/dev/nvme0n1`**. Reboot when it finishes and remove the USB.
+2. Under **Authentication**, add one user and mark it as superuser (sudo).
+3. Check the summary, then choose **Install**. The disk section **wipes `/dev/nvme0n1`**.
+4. When archinstall asks whether to chroot into the new system, choose **no**.
+5. Run `poweroff`.
+6. Once the laptop is off, remove the USB and turn the laptop back on.
 
 ## 3. Run the setup script
 
