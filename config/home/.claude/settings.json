@@ -1,5 +1,4 @@
 {
-  "theme": "dark",
   "attribution": {
     "commit": "",
     "pr": "",
@@ -11,6 +10,7 @@
       "autoCompactWindow": 400000
     }
   },
+  "theme": "dark",
   "preferredNotifChannel": "auto",
   "agentPushNotifEnabled": true
 }
