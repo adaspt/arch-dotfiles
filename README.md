@@ -49,9 +49,12 @@ It asks for your sudo password. It then:
 
 - clones this repo to `~/Projects/personal/arch-dotfiles`
 - sets up Snapper snapshots of `/`, with automatic cleanup of old ones
-- updates the system and installs zsh, its plugins and tools, `age`, `pacman-contrib` and `fwupd`
+- updates the system and installs zsh with its plugins, CLI tools, `age`, `pacman-contrib`, `fwupd`, qBittorrent,
+  Codex, Azure CLI, .NET SDK 10, nvm, Steam and flatpak
 - enables timers for SSD TRIM, pacman cache cleanup and a monthly btrfs scrub
-- installs paru, then Google Chrome, powerlevel10k and the OneDrive client from the AUR
+- installs paru, then Google Chrome, VS Code, powerlevel10k, the OneDrive client and T3 Code from the AUR
+- installs Claude Code with its own installer, so it updates itself
+- installs Node.js 24 with nvm
 - sets the full name on your user account and makes zsh your shell
 - enables linger, so tmux sessions and OneDrive keep running after you log out
 - links the config files in `config/home/` into `~`
@@ -75,6 +78,7 @@ Part 1 runs again and goes by quickly. Then the script:
 - decrypts `Backup/secrets.tar.gz.age` (it asks for the passphrase) and copies the SSH keys to `~/.ssh`
 - imports the WireGuard VPN `agersi-vpn`, which doesn't connect automatically: `nmcli connection up agersi-vpn`
 - copies the fonts in `Backup/fonts` to `~/.local/share/fonts`
+- installs GeForce NOW with NVIDIA's installer, as a user flatpak
 
 Part 2 needs the desktop session because the login screen unlocks the keyring. Keep your keyring password the same as your login password. Your SSH key passphrases are saved in the keyring the first time you use each key.
 

@@ -79,6 +79,17 @@ system_setup() {
         tmux eza fzf zoxide yazi
         # Decrypts the secrets archive in part 2
         age
+        # CLI tools
+        less bat btop htop fd ripgrep 7zip wl-clipboard
+        # Apps
+        qbittorrent
+        # Coding agents (T3 Code comes from the AUR, Claude Code from its installer, both below)
+        openai-codex
+        # Development
+        azure-cli dotnet-sdk-10.0 nvm
+        # Gaming. lib32-vulkan-intel is named here, or --noconfirm would pick the NVIDIA driver for Steam.
+        # flatpak is for GeForce NOW, installed in part 2.
+        steam lib32-vulkan-intel flatpak
     )
     sudo pacman -Syu --needed --noconfirm "${packages[@]}"
 
@@ -96,7 +107,23 @@ system_setup() {
         (cd "$build_dir" && makepkg -si --noconfirm)
         rm -rf "$build_dir"
     fi
-    paru -S --needed --noconfirm --skipreview google-chrome zsh-theme-powerlevel10k onedrive-abraunegg
+    local aur_packages=(
+        google-chrome visual-studio-code-bin
+        zsh-theme-powerlevel10k
+        onedrive-abraunegg
+        t3code-bin
+    )
+    paru -S --needed --noconfirm --skipreview "${aur_packages[@]}"
+
+    # The native install rather than the AUR package: it updates itself as soon as a release is out
+    echo "==> Installing Claude Code"
+    [[ -x "$HOME/.local/bin/claude" ]] || curl -fsSL https://claude.ai/install.sh | bash
+
+    # In its own bash: nvm isn't written for set -euo pipefail. Installs the latest 24.x, or keeps it
+    # if already there, and makes it the default for new shells
+    echo "==> Installing Node.js 24 with nvm"
+    mkdir -p "$HOME/.nvm"
+    bash -c 'source /usr/share/nvm/init-nvm.sh && nvm install 24 && nvm alias default 24'
 
     echo "==> Setting your full name and zsh as your shell"
     sudo chfn -f "$FULL_NAME" "$USER"
@@ -162,6 +189,22 @@ desktop_setup() {
         mkdir -p "$HOME/.local/share/fonts"
         cp -r "$HOME/OneDrive/Backup/fonts/." "$HOME/.local/share/fonts/"
         fc-cache -f
+    fi
+
+    # NVIDIA's installer sets GeForce NOW up as a user flatpak, which updates through flatpak after that.
+    # It writes GeForceNOWSetup.log to its working directory, so it runs in a temp dir.
+    if ! flatpak info --user com.nvidia.geforcenow &>/dev/null; then
+        echo "==> Installing GeForce NOW"
+        flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+        local gfn_dir
+        gfn_dir=$(mktemp -d)
+        curl -fSL -o "$gfn_dir/GeForceNOWSetup.bin" https://international.download.nvidia.com/GFNLinux/GeForceNOWSetup.bin
+        chmod +x "$gfn_dir/GeForceNOWSetup.bin"
+        if ! (cd "$gfn_dir" && ./GeForceNOWSetup.bin); then
+            echo "GeForce NOW install failed, see $gfn_dir/GeForceNOWSetup.log" >&2
+            exit 1
+        fi
+        rm -rf "$gfn_dir"
     fi
 }
 

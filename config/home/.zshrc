@@ -92,8 +92,8 @@ path=($path "$HOME/.dotnet/tools")
 
 
 # ---------- Development ----------
-export NVM_DIR="$HOME/.nvm"
-[[ ! -s "$NVM_DIR/nvm.sh" ]] || source "$NVM_DIR/nvm.sh"
+# nvm from the Arch package: sets NVM_DIR to ~/.nvm, where the Node.js versions go
+[[ ! -f /usr/share/nvm/init-nvm.sh ]] || source /usr/share/nvm/init-nvm.sh
 
 export DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS=1000
 
