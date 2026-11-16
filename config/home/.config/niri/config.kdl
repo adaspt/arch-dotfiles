@@ -615,6 +615,8 @@ binds {
     // Mod+Shift+Space { switch-layout "prev"; }
 
     Print { screenshot; }
+    // Same as Print, for keyboards without a Print key
+    Mod+Shift+S hotkey-overlay-title="Take a Screenshot" { screenshot; }
     Ctrl+Print { screenshot-screen; }
     Alt+Print { screenshot-window; }
 
