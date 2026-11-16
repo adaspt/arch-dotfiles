@@ -191,6 +191,14 @@ desktop_setup() {
         fc-cache -f
     fi
 
+    # Copied out of OneDrive, so it stays if the original is moved or deleted
+    local wallpaper="winter-mountain-3840x2160-24311.jpg"
+    if [[ -f "$HOME/OneDrive/Backup/$wallpaper" ]]; then
+        echo "==> Copying the wallpaper from OneDrive"
+        mkdir -p "$HOME/Pictures/Wallpapers"
+        cp "$HOME/OneDrive/Backup/$wallpaper" "$HOME/Pictures/Wallpapers/"
+    fi
+
     # NVIDIA's installer sets GeForce NOW up as a user flatpak, which updates through flatpak after that.
     # It writes GeForceNOWSetup.log to its working directory, so it runs in a temp dir.
     if ! flatpak info --user com.nvidia.geforcenow &>/dev/null; then

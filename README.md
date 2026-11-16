@@ -78,6 +78,7 @@ Part 1 runs again and goes by quickly. Then the script:
 - decrypts `Backup/secrets.tar.gz.age` (it asks for the passphrase) and copies the SSH keys to `~/.ssh`
 - imports the WireGuard VPN `agersi-vpn`, which doesn't connect automatically: `nmcli connection up agersi-vpn`
 - copies the fonts in `Backup/fonts` to `~/.local/share/fonts`
+- copies the wallpaper from `Backup/` to `~/Pictures/Wallpapers`
 - installs GeForce NOW with NVIDIA's installer, as a user flatpak
 
 Part 2 needs the desktop session because the login screen unlocks the keyring. Keep your keyring password the same as your login password. Your SSH key passphrases are saved in the keyring the first time you use each key.
