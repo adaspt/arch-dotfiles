@@ -1,0 +1,148 @@
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+# ---------- History ----------
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=10000
+SAVEHIST=10000
+
+setopt INC_APPEND_HISTORY
+setopt SHARE_HISTORY
+setopt HIST_SAVE_NO_DUPS
+setopt HIST_IGNORE_DUPS
+setopt HIST_REDUCE_BLANKS
+setopt HIST_IGNORE_SPACE
+setopt HIST_VERIFY
+HISTORY_IGNORE='(cls|clear|cd ..|cd ~|exit|y)'
+
+
+# ---------- Shell behavior ----------
+setopt autocd
+setopt nobeep
+setopt extendedglob
+setopt nocaseglob
+setopt notify
+setopt nomatch
+
+
+# ---------- Completion ----------
+autoload -Uz compinit
+compinit
+
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' rehash true
+
+# ---------- Git branch in prompt ----------
+# autoload -Uz vcs_info
+# zstyle ':vcs_info:*' enable git
+# zstyle ':vcs_info:git:*' formats ' (%b)'
+
+
+# ---------- Prompt ----------
+# precmd() {
+#   vcs_info
+#   echo
+# }
+
+# setopt PROMPT_SUBST
+
+# if [[ -n "$SSH_CONNECTION" ]]; then
+#   HOST_INFO='%F{yellow}%m%f '
+# else
+#   HOST_INFO=''
+# fi
+
+# PROMPT='${HOST_INFO}%F{blue}%B%~%b%f%F{red}${vcs_info_msg_0_}%f
+# %F{magenta}❯%f '
+
+
+# ---------- Editor ----------
+export EDITOR='nano'
+
+
+# ---------- Aliases ----------
+alias cls='clear'
+alias ls='eza -a --color=auto --group-directories-first --icons=auto'
+alias la='eza -al --color=auto --group-directories-first --icons=auto'
+alias lt='eza -aT --color=auto --group-directories-first --icons=auto'
+alias grep='grep --color=auto'
+alias diff='diff --color=auto'
+alias ta='tmux new -A -s'
+
+compdef eza=ls
+
+# ---------- Yazi cwd integration ----------
+function y() {
+  local tmp cwd
+  tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+
+  command yazi "$@" --cwd-file="$tmp"
+  IFS= read -r -d '' cwd < "$tmp"
+
+  [[ "$cwd" != "$PWD" && -d "$cwd" ]] && builtin cd -- "$cwd"
+  rm -f -- "$tmp"
+}
+
+# ---------- Path ----------
+typeset -U path
+path=("$HOME/.local/bin" $path)
+path=($path "$HOME/.dotnet/tools")
+
+
+# ---------- Development ----------
+export NVM_DIR="$HOME/.nvm"
+[[ ! -s "$NVM_DIR/nvm.sh" ]] || source "$NVM_DIR/nvm.sh"
+
+export DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS=1000
+
+
+# ---------- Theme ----------
+[[ -f /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme ]] &&
+  source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+
+# ---------- fzf (defines widgets, so before syntax highlighting) ----------
+command -v fzf >/dev/null && source <(fzf --zsh)
+
+
+# ---------- Keybindings ----------
+cdParentKey() {
+  cd ..
+  zle accept-line
+}
+
+zle -N cdParentKey
+bindkey '^[[1;3A' cdParentKey
+
+bindkey '^[[1;5C' forward-word
+bindkey '^[[1;5D' backward-word
+bindkey '^[[H' beginning-of-line
+bindkey '^[[F' end-of-line
+bindkey '^?' backward-delete-char
+bindkey '^[[3~' delete-char
+bindkey '^H' backward-kill-word
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+bindkey '^[[Z' undo                             # Shift+Tab for undo
+
+
+# ---------- Optional plugins (syntax highlighting after all widgets, history-substring-search after it) ----------
+for plugin in zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search; do
+  [[ -f "/usr/share/zsh/plugins/$plugin/$plugin.zsh" ]] && source "/usr/share/zsh/plugins/$plugin/$plugin.zsh"
+done
+unset plugin
+
+
+# ---------- zoxide (last integration, so nothing replaces its cd hook) ----------
+# Only in a terminal: for an agent, cd to a missing directory must fail, not jump to a similar one
+# from history. Claude Code sets CLAUDECODE; other agents' shells have no terminal.
+if [[ -t 1 && -z "$CLAUDECODE" ]] && command -v zoxide >/dev/null; then
+  eval "$(zoxide init --cmd cd zsh)"
+fi
+
+
+# ---------- Local overrides (machine-specific, not in repo) ----------
+[[ ! -f ~/.zshrc.local ]] || source ~/.zshrc.local
