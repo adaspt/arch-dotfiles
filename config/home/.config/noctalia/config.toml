@@ -1,0 +1,44 @@
+# Noctalia settings. Noctalia reads this file, then applies what you change in its settings window on top
+# (saved in ~/.local/state/noctalia/settings.toml). To see everything you've changed, to copy it here:
+#   noctalia config export --credentials omit
+config_version = 20
+
+[bar.default]
+margin_ends = 0
+radius = 0
+
+# Screen off at 8 minutes, lock at 10, suspend at 60
+[idle]
+behavior_order = [ "screen-off", "lock", "lock-and-suspend" ]
+
+    [idle.behavior.screen-off]
+    action = "screen_off"
+    enabled = true
+    timeout = 480.0
+
+    [idle.behavior.lock]
+    action = "lock"
+    enabled = true
+    timeout = 600.0
+
+    [idle.behavior.lock-and-suspend]
+    action = "suspend"
+    enabled = true
+    lock_before_suspend = false
+    timeout = 3600.0
+
+# For the weather
+[location]
+address = "Kaunas, Lithuania"
+
+[theme]
+builtin = "Nord"
+mode = "light"
+shell_mode = "dark"
+
+# setup.sh copies the wallpaper here from OneDrive
+[wallpaper]
+directory = "/home/adas/Pictures/Wallpapers"
+
+    [wallpaper.default]
+    path = "/home/adas/Pictures/Wallpapers/winter-mountain-3840x2160-24311.jpg"
