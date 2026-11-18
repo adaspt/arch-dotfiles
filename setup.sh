@@ -66,6 +66,8 @@ system_setup() {
     local packages=(
         # System maintenance and firmware updates
         pacman-contrib fwupd
+        # Realtime priority for PipeWire, so audio doesn't crackle under load
+        rtkit
         # Desktop: Hyprland, the ReGreet login screen in cage, the fuzzel launcher, and the tools the
         # media keys in hyprland.lua run
         hyprland xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
