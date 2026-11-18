@@ -109,6 +109,26 @@ input {
     position x=1280 y=0
 }
 
+output "Lenovo Group Limited LEN T25d-10 VKBF3803" {
+    scale 1
+    position x=0 y=0
+}
+
+output "Dell Inc. DELL S2722QC JJ51MD3" {
+    scale 1.6
+    position x=1920 y=0
+}
+
+output "Dell Inc. DELL S2722QC 2X41MD3" {
+    scale 1.6
+    position x=4320 y=0
+}
+
+output "eDP-1" {
+    scale 2
+    position x=2400 y=1350
+}
+
 // Settings that influence how windows are positioned and sized.
 // Find more information on the wiki:
 // https://niri-wm.github.io/niri/Configuration:-Layout
