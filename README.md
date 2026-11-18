@@ -5,6 +5,7 @@ Arch Linux with niri and Noctalia on a Framework laptop (Intel).
 - `archinstall.json`: the archinstall config
 - `setup.sh`: everything after the first boot, in two parts with a reboot between them
 - `setup-dev.sh`: development tools, run by hand on machines that need them
+- `setup-gaming.sh`: Steam and GeForce NOW, run by hand on machines that need them
 - `config/etc/`: files that `setup.sh` copies to `/etc`
 - `config/home/`: files that `setup.sh` symlinks into `~`, so editing them in `~` edits the repo
 - `config/onedrive/`: OneDrive client config, copied once to `~/.config/onedrive`
@@ -51,8 +52,8 @@ It asks for your sudo password. It then:
 
 - clones this repo to `~/Projects/personal/arch-dotfiles`
 - sets up Snapper snapshots of `/`, with automatic cleanup of old ones
-- updates the system and installs zsh with its plugins, CLI tools, `age`, `pacman-contrib`, `fwupd`, qBittorrent,
-  Codex, Steam and flatpak
+- updates the system and installs zsh with its plugins, CLI tools, `age`, `pacman-contrib`, `fwupd`, qBittorrent
+  and Codex
 - enables timers for SSD TRIM, pacman cache cleanup and a monthly btrfs scrub
 - installs paru, then Google Chrome, VS Code, powerlevel10k, the OneDrive client and T3 Code from the AUR
 - installs Claude Code with its own installer, so it updates itself
@@ -81,7 +82,6 @@ Part 1 runs again and goes by quickly. Then the script:
 - imports the WireGuard VPN `agersi-vpn`, which doesn't connect automatically: `nmcli connection up agersi-vpn`
 - copies the fonts in `Backup/fonts` to `~/.local/share/fonts`
 - copies the wallpaper from `Backup/` to `~/Pictures/Wallpapers`
-- installs GeForce NOW with NVIDIA's installer, as a user flatpak
 
 Part 2 needs the desktop session because the login screen unlocks the keyring. Keep your keyring password the same as your login password. Your SSH key passphrases are saved in the keyring the first time you use each key.
 
@@ -96,6 +96,16 @@ On machines that build code locally, run this after part 1:
 ```
 
 It installs the .NET SDK 10 with ASP.NET Core, the EF Core tools (`dotnet ef`), Azure CLI, Azure Functions Core Tools, and Node.js 24 with nvm. Safe to run again.
+
+## Gaming
+
+On machines for gaming, run this from a terminal in the desktop session, after part 2:
+
+```sh
+~/Projects/personal/arch-dotfiles/setup-gaming.sh
+```
+
+It installs Steam, and GeForce NOW with NVIDIA's installer, as a user flatpak. Safe to run again.
 
 ## Secrets archive
 

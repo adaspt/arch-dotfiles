@@ -137,9 +137,7 @@
         "custom_repositories": [],
         "custom_servers": [],
         "mirror_regions": {},
-        "optional_repositories": [
-            "multilib"
-        ]
+        "optional_repositories": []
     },
     "network_config": {
         "type": "nm"

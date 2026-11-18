@@ -81,8 +81,6 @@ system_setup() {
         qbittorrent
         # Coding agents
         openai-codex
-        # Gaming. lib32-vulkan-intel is named here, or --noconfirm would pick the NVIDIA driver for Steam.
-        steam lib32-vulkan-intel flatpak
     )
     sudo pacman -Syu --needed --noconfirm "${packages[@]}"
 
@@ -183,22 +181,6 @@ desktop_setup() {
         echo "==> Copying the wallpaper from OneDrive"
         mkdir -p "$HOME/Pictures/Wallpapers"
         cp "$HOME/OneDrive/Backup/$wallpaper" "$HOME/Pictures/Wallpapers/"
-    fi
-
-    # NVIDIA's installer sets it up as a user flatpak. It writes its log to the working directory,
-    # so it runs in a temp dir.
-    if ! flatpak info --user com.nvidia.geforcenow &>/dev/null; then
-        echo "==> Installing GeForce NOW"
-        flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-        local gfn_dir
-        gfn_dir=$(mktemp -d)
-        curl -fSL -o "$gfn_dir/GeForceNOWSetup.bin" https://international.download.nvidia.com/GFNLinux/GeForceNOWSetup.bin
-        chmod +x "$gfn_dir/GeForceNOWSetup.bin"
-        if ! (cd "$gfn_dir" && ./GeForceNOWSetup.bin); then
-            echo "GeForce NOW install failed, see $gfn_dir/GeForceNOWSetup.log" >&2
-            exit 1
-        fi
-        rm -rf "$gfn_dir"
     fi
 }
 
