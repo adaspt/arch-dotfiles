@@ -81,9 +81,6 @@ system_setup() {
         qbittorrent
         # Coding agents
         openai-codex
-        # Development
-        # The ASP.NET packages are separate on Arch; without them, web projects fail with NETSDK1226.
-        azure-cli dotnet-sdk-10.0 aspnet-targeting-pack-10.0 aspnet-runtime-10.0 nvm
         # Gaming. lib32-vulkan-intel is named here, or --noconfirm would pick the NVIDIA driver for Steam.
         steam lib32-vulkan-intel flatpak
     )
@@ -105,21 +102,13 @@ system_setup() {
         google-chrome visual-studio-code-bin
         zsh-theme-powerlevel10k
         onedrive-abraunegg
-        t3code-bin azure-functions-core-tools-bin
+        t3code-bin
     )
     paru -S --needed --noconfirm --skipreview "${aur_packages[@]}"
 
     # The native installer, not the AUR package: it updates itself
     echo "==> Installing Claude Code"
     [[ -x "$HOME/.local/bin/claude" ]] || curl -fsSL https://claude.ai/install.sh | bash
-
-    echo "==> Installing the EF Core tools (dotnet ef)"
-    [[ -x "$HOME/.dotnet/tools/dotnet-ef" ]] || dotnet tool install --global dotnet-ef
-
-    # In its own bash: nvm isn't written for set -euo pipefail
-    echo "==> Installing Node.js 24 with nvm"
-    mkdir -p "$HOME/.nvm"
-    bash -c 'source /usr/share/nvm/init-nvm.sh && nvm install 24 && nvm alias default 24'
 
     echo "==> Setting your full name and zsh as your shell"
     sudo chfn -f "$FULL_NAME" "$USER"
