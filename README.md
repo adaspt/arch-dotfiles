@@ -1,6 +1,6 @@
 # arch-dotfiles
 
-Arch Linux with niri and Noctalia on a Framework laptop (Intel).
+Arch Linux with Hyprland on a Framework laptop (Intel).
 
 - `archinstall.json`: the archinstall config
 - `setup.sh`: everything after the first boot, in two parts with a reboot between them
@@ -52,23 +52,23 @@ It asks for your sudo password. It then:
 
 - clones this repo to `~/Projects/personal/arch-dotfiles`
 - sets up Snapper snapshots of `/`, with automatic cleanup of old ones
-- updates the system and installs zsh with its plugins, CLI tools, `age`, `pacman-contrib`, `fwupd`, qBittorrent
-  and Codex
+- updates the system and installs Hyprland, the ReGreet login screen, the fuzzel launcher, zsh with its plugins,
+  CLI tools, `age`, `pacman-contrib`, `fwupd`, qBittorrent and Codex
 - enables timers for SSD TRIM, pacman cache cleanup and a monthly btrfs scrub
 - installs paru, then Google Chrome, VS Code, powerlevel10k, the OneDrive client and T3 Code from the AUR
 - installs Claude Code with its own installer, so it updates itself
 - sets the full name on your user account and makes zsh your shell
 - enables linger, so tmux sessions and OneDrive keep running after you log out
 - links the config files in `config/home/` into `~`
-- tells VS Code to keep secrets in the keyring, as it doesn't recognise niri
+- tells VS Code to keep secrets in the keyring, as it doesn't recognise Hyprland
 - enables the SSH agent
-- sets up the Noctalia login screen, which unlocks the keyring
+- enables the ReGreet login screen, which unlocks the keyring
 
 Then it stops and asks you to reboot.
 
 ## 4. Run the setup script, part 2
 
-After the reboot you get the Noctalia login screen. Log in, open a terminal with **Super+T** and run the script again:
+After the reboot you get the ReGreet login screen. Log in to Hyprland, open a terminal with **Super+T** and run the script again:
 
 ```sh
 ~/Projects/personal/arch-dotfiles/setup.sh
@@ -134,6 +134,6 @@ fwupdmgr update
 ## If something breaks
 
 - **Ctrl+Alt+F2** opens a text login, where you can fix things.
-- `journalctl -u greetd -b` shows login screen errors. `journalctl --user -b | grep niri` shows niri errors.
-- `sudo systemctl disable greetd` and a reboot take you back to the text login. From there you can start niri with `niri-session`.
+- `journalctl -u greetd -b` shows login screen errors. Hyprland logs to `$XDG_RUNTIME_DIR/hypr/*/hyprland.log`.
+- `sudo systemctl disable greetd` and a reboot take you back to the text login. From there you can start Hyprland with `start-hyprland`.
 - Snapper takes a snapshot before and after every pacman or paru run. `sudo snapper -c root list` lists them, and `sudo snapper -c root undochange 41..42` undoes the changes of one update.

@@ -1,6 +1,7 @@
 [terminal]
 vt = 1
 
+# ReGreet, in cage, on the last connected monitor. -s allows switching to a text login (Ctrl+Alt+F2)
 [default_session]
-command = "/usr/bin/noctalia-greeter-session"
+command = "cage -s -m last -- regreet"
 user = "greeter"

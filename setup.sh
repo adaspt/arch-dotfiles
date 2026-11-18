@@ -4,7 +4,7 @@
 # 1. From the text login after the first boot:
 #      curl -fsSL https://raw.githubusercontent.com/adaspt/arch-dotfiles/main/setup.sh | bash
 #    Sets up the system, shell and login screen, then stops and asks for a reboot.
-# 2. After the reboot, log in on the Noctalia login screen and run it again from a terminal:
+# 2. After the reboot, log in on the login screen and run it again from a terminal:
 #      ~/Projects/personal/arch-dotfiles/setup.sh
 #    Sets up OneDrive (signing in needs a browser), and SSH keys, VPN and fonts from it.
 #
@@ -34,7 +34,7 @@ main() {
 
     if [[ -z ${WAYLAND_DISPLAY:-} ]]; then
         echo
-        echo "Part 1 is done. Reboot (sudo reboot), log in on the Noctalia login screen,"
+        echo "Part 1 is done. Reboot (sudo reboot), log in on the login screen,"
         echo "open a terminal (Super+T) and run the script again:"
         echo "  $REPO_DIR/setup.sh"
         exit 0
@@ -54,10 +54,6 @@ system_setup() {
         git clone "$REPO_URL" "$REPO_DIR"
     fi
 
-    # Copied, not linked: files in /etc have to be owned by root
-    echo "==> Copying system config (greetd, PAM keyring unlock)"
-    sudo cp -r "$REPO_DIR/config/etc/." /etc/
-
     # archinstall creates no snapper config, so snap-pac takes no snapshots until this runs.
     # Before the update, so the update is the first thing snapshotted.
     echo "==> Setting up Snapper snapshots of /"
@@ -70,6 +66,10 @@ system_setup() {
     local packages=(
         # System maintenance and firmware updates
         pacman-contrib fwupd
+        # Desktop: Hyprland, the ReGreet login screen in cage, the fuzzel launcher, and the tools the
+        # media keys in hyprland.lua run
+        hyprland xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
+        greetd-regreet cage fuzzel brightnessctl playerctl
         # Shell, and the tools .zshrc uses
         zsh zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search
         tmux eza fzf zoxide yazi
@@ -83,6 +83,11 @@ system_setup() {
         openai-codex
     )
     sudo pacman -Syu --needed --noconfirm "${packages[@]}"
+
+    # Copied, not linked: files in /etc have to be owned by root. After the install, as greetd's
+    # files would otherwise conflict with it.
+    echo "==> Copying system config (greetd, PAM keyring unlock)"
+    sudo cp -r "$REPO_DIR/config/etc/." /etc/
 
     # fstrim is for the FAT32 /boot: btrfs already trims with discard=async. btrfs-scrub@- scrubs /.
     echo "==> Enabling maintenance timers"
@@ -126,7 +131,11 @@ system_setup() {
         ln -sfn "$file" "$HOME/$rel"
     done < <(find "$REPO_DIR/config/home" -type f -print0)
     chmod 700 "$HOME/.ssh"
-    niri validate
+    local hypr_check
+    if ! hypr_check=$(Hyprland --verify-config -c "$HOME/.config/hypr/hyprland.lua" 2>&1); then
+        echo "$hypr_check" >&2
+        exit 1
+    fi
 
     echo "==> Telling VS Code to keep secrets in gnome-keyring"
     mkdir -p "$HOME/.vscode"
@@ -136,7 +145,6 @@ system_setup() {
     systemctl --user enable gcr-ssh-agent.socket
 
     echo "==> Enabling the login screen"
-    sudo noctalia-greeter-apply-appearance --setup-system
     sudo systemctl enable greetd
 }
 

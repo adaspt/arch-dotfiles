@@ -150,15 +150,10 @@
         "openssh",
         "vulkan-intel",
         "intel-media-driver",
-        "niri",
-        "xdg-desktop-portal-gnome",
-        "xwayland-satellite",
-        "noctalia",
         "gnome-keyring",
         "ghostty",
         "ttf-jetbrains-mono-nerd",
         "snap-pac",
-        "noctalia-greeter",
         "upower"
     ],
     "pacman_config": {
