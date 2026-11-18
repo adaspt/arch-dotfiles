@@ -6,20 +6,17 @@
 #    Sets up the system, shell and login screen, then stops and asks for a reboot.
 # 2. After the reboot, log in on the Noctalia login screen and run it again from a terminal:
 #      ~/Projects/personal/arch-dotfiles/setup.sh
-#    Part 1 finds its work done and goes by quickly. Then OneDrive (signing in needs a browser),
-#    and SSH keys, VPN and fonts from it.
+#    Sets up OneDrive (signing in needs a browser), and SSH keys, VPN and fonts from it.
 #
 # Part 2 needs the desktop session because the login screen unlocks the keyring, and Chrome and
-# OneDrive should be set up with it unlocked. Started from a terminal in niri, the script runs through.
-# Safe to run again any time.
+# OneDrive should be set up with it unlocked. Safe to run again any time.
 set -euo pipefail
 
 FULL_NAME="Adas Petrovas"
 REPO_URL=https://github.com/adaspt/arch-dotfiles.git
 REPO_DIR="$HOME/Projects/personal/arch-dotfiles"
 
-# The decrypted secrets archive. In the runtime dir, a tmpfs only this user can read:
-# never written to disk, and deleted when the script exits, also after an error or Ctrl-C
+# Decrypted secrets: on a tmpfs only this user can read, deleted on exit, error or Ctrl-C
 SECRETS_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/arch-dotfiles-secrets"
 trap 'rm -rf "$SECRETS_DIR" "$SECRETS_DIR.part"' EXIT
 
@@ -51,7 +48,6 @@ main() {
 
 # ---------- Part 1: needs no desktop session ----------
 system_setup() {
-    # An existing clone is left as it is, local changes included
     if [[ ! -d "$REPO_DIR/.git" ]]; then
         echo "==> Cloning this repo to $REPO_DIR"
         mkdir -p "$(dirname "$REPO_DIR")"
@@ -62,8 +58,8 @@ system_setup() {
     echo "==> Copying system config (greetd, PAM keyring unlock)"
     sudo cp -r "$REPO_DIR/config/etc/." /etc/
 
-    # archinstall installs snapper and snap-pac but creates no config, so snap-pac takes no snapshots.
-    # This runs before the update below so that the update is the first thing snapshotted.
+    # archinstall creates no snapper config, so snap-pac takes no snapshots until this runs.
+    # Before the update, so the update is the first thing snapshotted.
     echo "==> Setting up Snapper snapshots of /"
     if [[ ! -f /etc/snapper/configs/root ]]; then
         sudo snapper -c root create-config /
@@ -83,20 +79,17 @@ system_setup() {
         less bat btop htop fd ripgrep 7zip wl-clipboard
         # Apps
         qbittorrent
-        # Coding agents (T3 Code comes from the AUR, Claude Code from its installer, both below)
+        # Coding agents
         openai-codex
         # Development
         # The ASP.NET packages are separate on Arch; without them, web projects fail with NETSDK1226.
         azure-cli dotnet-sdk-10.0 aspnet-targeting-pack-10.0 aspnet-runtime-10.0 nvm
         # Gaming. lib32-vulkan-intel is named here, or --noconfirm would pick the NVIDIA driver for Steam.
-        # flatpak is for GeForce NOW, installed in part 2.
         steam lib32-vulkan-intel flatpak
     )
     sudo pacman -Syu --needed --noconfirm "${packages[@]}"
 
-    # fstrim: btrfs already trims with discard=async, but this also covers the FAT32 /boot.
-    # paccache: keeps the last 3 versions of each package in the pacman cache.
-    # btrfs-scrub@-: checks the root filesystem for corruption once a month.
+    # fstrim is for the FAT32 /boot: btrfs already trims with discard=async. btrfs-scrub@- scrubs /.
     echo "==> Enabling maintenance timers"
     sudo systemctl enable --now fstrim.timer paccache.timer btrfs-scrub@-.timer
 
@@ -112,16 +105,18 @@ system_setup() {
         google-chrome visual-studio-code-bin
         zsh-theme-powerlevel10k
         onedrive-abraunegg
-        t3code-bin
+        t3code-bin azure-functions-core-tools-bin
     )
     paru -S --needed --noconfirm --skipreview "${aur_packages[@]}"
 
-    # The native install rather than the AUR package: it updates itself as soon as a release is out
+    # The native installer, not the AUR package: it updates itself
     echo "==> Installing Claude Code"
     [[ -x "$HOME/.local/bin/claude" ]] || curl -fsSL https://claude.ai/install.sh | bash
 
-    # In its own bash: nvm isn't written for set -euo pipefail. Installs the latest 24.x, or keeps it
-    # if already there, and makes it the default for new shells
+    echo "==> Installing the EF Core tools (dotnet ef)"
+    [[ -x "$HOME/.dotnet/tools/dotnet-ef" ]] || dotnet tool install --global dotnet-ef
+
+    # In its own bash: nvm isn't written for set -euo pipefail
     echo "==> Installing Node.js 24 with nvm"
     mkdir -p "$HOME/.nvm"
     bash -c 'source /usr/share/nvm/init-nvm.sh && nvm install 24 && nvm alias default 24'
@@ -135,8 +130,7 @@ system_setup() {
     # Keeps tmux sessions and the OneDrive service running after you log out
     sudo loginctl enable-linger "$USER"
 
-    # Symlinked, so editing ~/.config/niri/config.kdl edits the file in the repo.
-    # Each file is linked on its own, so ~/.config and ~/.ssh keep everything else in them.
+    # Each file is linked on its own, so ~/.config and ~/.ssh keep their other files
     echo "==> Linking config files into ~"
     local file rel
     while IFS= read -r -d '' file; do
@@ -146,6 +140,10 @@ system_setup() {
     done < <(find "$REPO_DIR/config/home" -type f -print0)
     chmod 700 "$HOME/.ssh"
     niri validate
+
+    echo "==> Telling VS Code to keep secrets in gnome-keyring"
+    mkdir -p "$HOME/.vscode"
+    [[ -f "$HOME/.vscode/argv.json" ]] || cp "$REPO_DIR/config/vscode/argv.json" "$HOME/.vscode/argv.json"
 
     echo "==> Enabling the SSH agent"
     systemctl --user enable gcr-ssh-agent.socket
@@ -159,12 +157,10 @@ system_setup() {
 desktop_setup() {
     setup_onedrive
 
-    # Skipped once the keys are there, so running again doesn't ask for the passphrase
     if [[ ! -f "$HOME/.ssh/id_ed25519" ]]; then
         unlock_secrets
         echo "==> Copying SSH keys"
-        # Not the archive's config: ~/.ssh/config links to the repo, and copying over it would write
-        # into the repo. It goes to config.local, which the repo's config includes.
+        # ~/.ssh/config links to the repo, so the archive's config goes to config.local, which it includes
         find "$SECRETS_DIR/ssh" -mindepth 1 -maxdepth 1 ! -name config -exec cp -r {} "$HOME/.ssh/" \;
         [[ ! -f "$SECRETS_DIR/ssh/config" ]] || cp "$SECRETS_DIR/ssh/config" "$HOME/.ssh/config.local"
     fi
@@ -200,8 +196,8 @@ desktop_setup() {
         cp "$HOME/OneDrive/Backup/$wallpaper" "$HOME/Pictures/Wallpapers/"
     fi
 
-    # NVIDIA's installer sets GeForce NOW up as a user flatpak, which updates through flatpak after that.
-    # It writes GeForceNOWSetup.log to its working directory, so it runs in a temp dir.
+    # NVIDIA's installer sets it up as a user flatpak. It writes its log to the working directory,
+    # so it runs in a temp dir.
     if ! flatpak info --user com.nvidia.geforcenow &>/dev/null; then
         echo "==> Installing GeForce NOW"
         flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
@@ -217,12 +213,11 @@ desktop_setup() {
     fi
 }
 
-# OneDrive client syncing the folders in config/onedrive/sync_list into ~/OneDrive
 setup_onedrive() {
     local config_dir="$HOME/.config/onedrive"
 
     # Copied, not linked: changing config or sync_list makes the client refuse to sync until --resync,
-    # so a git pull shouldn't change them under the running client. Existing files are kept.
+    # so a git pull shouldn't change them under the running client.
     mkdir -p "$config_dir"
     for f in config sync_list; do
         [[ -f "$config_dir/$f" ]] || cp "$REPO_DIR/config/onedrive/$f" "$config_dir/$f"
@@ -241,17 +236,15 @@ setup_onedrive() {
         fi
     fi
 
-    # Only Backup/ now, since the rest of part 2 needs it and the full first sync can take long.
-    # The first sync with a sync_list needs --resync, as there's no saved state yet
+    # Only Backup/ for now: part 2 needs it, and the full first sync can take long.
+    # --resync because a first sync with a sync_list has no saved state yet
     echo "==> Syncing OneDrive Backup/"
     onedrive --sync --single-directory Backup --resync --resync-auth
 
-    # The service syncs the rest in the background, and keeps syncing (linger) when you're logged out
     systemctl --user enable --now onedrive
 }
 
-# Decrypts Backup/secrets.tar.gz.age from OneDrive into SECRETS_DIR, once per run. Asks for the age passphrase.
-# Contents: ssh/ (for ~/.ssh) and agersi-vpn.conf
+# Decrypts the archive from OneDrive into SECRETS_DIR. Contents: ssh/ (for ~/.ssh) and agersi-vpn.conf
 unlock_secrets() {
     local archive="$HOME/OneDrive/Backup/secrets.tar.gz.age"
     [[ ! -d "$SECRETS_DIR" ]] || return 0

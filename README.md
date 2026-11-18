@@ -7,6 +7,7 @@ Arch Linux with niri and Noctalia on a Framework laptop (Intel).
 - `config/etc/`: files that `setup.sh` copies to `/etc`
 - `config/home/`: files that `setup.sh` symlinks into `~`, so editing them in `~` edits the repo
 - `config/onedrive/`: OneDrive client config, copied once to `~/.config/onedrive`
+- `config/vscode/`: VS Code `argv.json`, copied once to `~/.vscode`
 
 ## 1. Connect to Wi-Fi on the install USB
 
@@ -52,12 +53,14 @@ It asks for your sudo password. It then:
 - updates the system and installs zsh with its plugins, CLI tools, `age`, `pacman-contrib`, `fwupd`, qBittorrent,
   Codex, Azure CLI, .NET SDK 10, nvm, Steam and flatpak
 - enables timers for SSD TRIM, pacman cache cleanup and a monthly btrfs scrub
-- installs paru, then Google Chrome, VS Code, powerlevel10k, the OneDrive client and T3 Code from the AUR
+- installs paru, then Google Chrome, VS Code, powerlevel10k, the OneDrive client, T3 Code and Azure Functions Core Tools from the AUR
 - installs Claude Code with its own installer, so it updates itself
+- installs the EF Core tools (`dotnet ef`)
 - installs Node.js 24 with nvm
 - sets the full name on your user account and makes zsh your shell
 - enables linger, so tmux sessions and OneDrive keep running after you log out
 - links the config files in `config/home/` into `~`
+- tells VS Code to keep secrets in the keyring, as it doesn't recognise niri
 - enables the SSH agent
 - sets up the Noctalia login screen, which unlocks the keyring
 
