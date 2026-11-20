@@ -6,6 +6,15 @@ config_version = 20
 [bar.default]
 margin_ends = 0
 radius = 0
+# The default right side without "media": a changing song title is distracting. What's playing
+# is in the control center (Super+S).
+end = [
+    "tray", "notifications", "clipboard", "network", "bluetooth", "volume", "brightness",
+    "battery", "control-center", "session",
+]
+# Day of the week and date before the time: Fri 20 Nov 18:45. "date" is Noctalia's built-in
+# date widget.
+center = ["date", "clock"]
 
 # Screen off at 8 minutes, lock at 10, suspend at 60
 [idle]
