@@ -15,12 +15,29 @@
 ------------------
 
 -- See https://wiki.hypr.land/configuring/core/monitors/
+-- Any other monitor: placed automatically
 hl.monitor({
     output   = "",
     mode     = "preferred",
     position = "auto",
     scale    = "auto",
 })
+
+-- The home desk, left to right, aligned at the top: the laptop, then the two Dells. They're matched
+-- by make, model and serial, so they keep their place on any port or dock. Positions are in scaled
+-- pixels: the laptop is 1440 wide at scale 2, the 4K Dell 2560 at scale 1.5.
+local laptop    = "eDP-1"
+local dellMid   = "desc:Dell Inc. DELL S2722QC DD71MD3"
+local dellRight = "desc:Dell Inc. DELL U2415 7MT018640W0U"
+hl.monitor({ output = laptop,    mode = "preferred", position = "0x0",    scale = 2 })
+hl.monitor({ output = dellMid,   mode = "preferred", position = "1440x0", scale = 1.5 })
+hl.monitor({ output = dellRight, mode = "preferred", position = "4000x0", scale = 1 })
+
+-- Workspaces 1, 2 and 3 open on those monitors, so Super+Shift+2 sends a window to the middle one.
+-- Without the Dells, they open on the laptop.
+hl.workspace_rule({ workspace = "1", monitor = laptop,    default = true })
+hl.workspace_rule({ workspace = "2", monitor = dellMid,   default = true })
+hl.workspace_rule({ workspace = "3", monitor = dellRight, default = true })
 
 
 ---------------------
