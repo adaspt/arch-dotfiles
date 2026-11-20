@@ -302,10 +302,10 @@ hl.bind(mainMod .. " + SHIFT + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 
--- Noctalia's launcher, control center, settings and window switcher, as on niri
+-- Noctalia's launcher, control center and window switcher, as on niri. Its settings open from the
+-- gear in the control center.
 hl.bind(mainMod .. " + space",         hl.dsp.exec_cmd(noctalia .. "panel-toggle launcher"))
 hl.bind(mainMod .. " + S",             hl.dsp.exec_cmd(noctalia .. "panel-toggle control-center"))
-hl.bind(mainMod .. " + SHIFT + comma", hl.dsp.exec_cmd(noctalia .. "settings-toggle"))
 
 -- Lock as on Windows, GNOME and KDE. The session menu (lock, suspend, log out, reboot, shut down)
 -- replaces Hyprland's Super+M, which quit at once without asking.
@@ -315,10 +315,12 @@ hl.bind(mainMod .. " + Escape",        hl.dsp.exec_cmd(noctalia .. "panel-toggle
 -- Clipboard history, as on Windows and Omarchy
 hl.bind(mainMod .. " + V",             hl.dsp.exec_cmd(noctalia .. "panel-toggle clipboard"))
 
--- Notifications, as the bell in the bar: Super+N shows them (Win+N on Windows),
--- Super+Shift+N clears them, both the ones on screen and the history
-hl.bind(mainMod .. " + N",             hl.dsp.exec_cmd(noctalia .. "panel-toggle control-center notifications"))
-hl.bind(mainMod .. " + SHIFT + N",     hl.dsp.exec_cmd(noctalia .. "notification-clear-active; " .. noctalia .. "notification-clear-history"))
+-- Notifications on Comma, as on Omarchy. Super+Comma dismisses the ones on screen (Noctalia can't
+-- dismiss just the latest), Super+Shift+Comma also clears the history, and Super+Alt+Comma does what
+-- clicking the latest one does (opens the chat, the downloaded file, ...). The bell in the bar shows them.
+hl.bind(mainMod .. " + comma",         hl.dsp.exec_cmd(noctalia .. "notification-clear-active"))
+hl.bind(mainMod .. " + SHIFT + comma", hl.dsp.exec_cmd(noctalia .. "notification-clear-active; " .. noctalia .. "notification-clear-history"))
+hl.bind(mainMod .. " + ALT + comma",   hl.dsp.exec_cmd(noctalia .. "notification-invoke-latest"))
 -- The power button opens the same menu. systemd ignores it (config/etc/systemd/logind.conf.d).
 hl.bind("XF86PowerOff",                hl.dsp.exec_cmd(noctalia .. "panel-toggle session"))
 
