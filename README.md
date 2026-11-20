@@ -1,6 +1,6 @@
 # arch-dotfiles
 
-Arch Linux with Hyprland on a Framework laptop (Intel).
+Arch Linux with Hyprland and Noctalia on a Framework laptop (Intel).
 
 - `archinstall.json`: the archinstall config
 - `setup.sh`: everything after the first boot, in two parts with a reboot between them
@@ -52,8 +52,8 @@ It asks for your sudo password. It then:
 
 - clones this repo to `~/Projects/personal/arch-dotfiles`
 - sets up Snapper snapshots of `/`, with automatic cleanup of old ones
-- updates the system and installs Hyprland, the ReGreet login screen, the fuzzel launcher, zsh with its plugins,
-  CLI tools, `age`, `pacman-contrib`, `fwupd`, qBittorrent and Codex
+- updates the system and installs Hyprland, Noctalia and its login screen, zsh with its plugins, CLI tools, `age`,
+  `pacman-contrib`, `fwupd`, qBittorrent and Codex
 - enables timers for SSD TRIM, pacman cache cleanup and a monthly btrfs scrub
 - installs paru, then Google Chrome, VS Code, powerlevel10k, the OneDrive client and T3 Code from the AUR
 - installs Claude Code with its own installer, so it updates itself
@@ -62,13 +62,13 @@ It asks for your sudo password. It then:
 - links the config files in `config/home/` into `~`
 - tells VS Code to keep secrets in the keyring, as it doesn't recognise Hyprland
 - enables the SSH agent
-- enables the ReGreet login screen, which unlocks the keyring
+- sets up the Noctalia login screen, which unlocks the keyring
 
 Then it stops and asks you to reboot.
 
 ## 4. Run the setup script, part 2
 
-After the reboot you get the ReGreet login screen. Log in to Hyprland, open a terminal with **Super+T** and run the script again:
+After the reboot you get the Noctalia login screen. Log in to Hyprland, open a terminal with **Super+T** and run the script again:
 
 ```sh
 ~/Projects/personal/arch-dotfiles/setup.sh

@@ -4,7 +4,7 @@
 # 1. From the text login after the first boot:
 #      curl -fsSL https://raw.githubusercontent.com/adaspt/arch-dotfiles/main/setup.sh | bash
 #    Sets up the system, shell and login screen, then stops and asks for a reboot.
-# 2. After the reboot, log in on the login screen and run it again from a terminal:
+# 2. After the reboot, log in on the Noctalia login screen and run it again from a terminal:
 #      ~/Projects/personal/arch-dotfiles/setup.sh
 #    Sets up OneDrive (signing in needs a browser), and SSH keys, VPN and fonts from it.
 #
@@ -34,7 +34,7 @@ main() {
 
     if [[ -z ${WAYLAND_DISPLAY:-} ]]; then
         echo
-        echo "Part 1 is done. Reboot (sudo reboot), log in on the login screen,"
+        echo "Part 1 is done. Reboot (sudo reboot), log in on the Noctalia login screen,"
         echo "open a terminal (Super+T) and run the script again:"
         echo "  $REPO_DIR/setup.sh"
         exit 0
@@ -68,10 +68,10 @@ system_setup() {
         pacman-contrib fwupd
         # Realtime priority for PipeWire, so audio doesn't crackle under load
         rtkit
-        # Desktop: Hyprland, the ReGreet login screen in cage, the fuzzel launcher, and the tools the
-        # media keys in hyprland.lua run
+        # Desktop: Hyprland, Noctalia (bar, launcher, notifications, lock screen, wallpaper) and the
+        # Noctalia login screen
         hyprland xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
-        greetd-regreet cage fuzzel brightnessctl playerctl
+        noctalia noctalia-greeter
         # Shell, and the tools .zshrc uses
         zsh zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search
         tmux eza fzf zoxide yazi
@@ -147,6 +147,7 @@ system_setup() {
     systemctl --user enable gcr-ssh-agent.socket
 
     echo "==> Enabling the login screen"
+    sudo noctalia-greeter-apply-appearance --setup-system
     sudo systemctl enable greetd
 }
 

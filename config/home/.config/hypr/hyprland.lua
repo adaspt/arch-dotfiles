@@ -30,7 +30,9 @@ hl.monitor({
 -- Set programs that you use
 local terminal    = "ghostty"
 local fileManager = "dolphin"
-local menu        = "fuzzel"
+
+-- Noctalia (bar, launcher, notifications, lock screen, wallpaper) takes commands through this
+local noctalia    = "noctalia msg "
 
 
 -------------------
@@ -47,6 +49,10 @@ local menu        = "fuzzel"
 --   hl.exec_cmd("nm-applet")
 --   hl.exec_cmd("waybar & hyprpaper & firefox")
 -- end)
+
+hl.on("hyprland.start", function ()
+    hl.exec_cmd("noctalia")
+end)
 
 
 -------------------------------
@@ -274,9 +280,16 @@ hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen({ mode = "fullscreen
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
-hl.bind(mainMod .. " + space", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
+
+-- Noctalia's launcher, control center, settings, lock screen and window switcher, as on niri
+hl.bind(mainMod .. " + space",         hl.dsp.exec_cmd(noctalia .. "panel-toggle launcher"))
+hl.bind(mainMod .. " + S",             hl.dsp.exec_cmd(noctalia .. "panel-toggle control-center"))
+hl.bind(mainMod .. " + SHIFT + comma", hl.dsp.exec_cmd(noctalia .. "settings-toggle"))
+hl.bind(mainMod .. " + ALT + L",       hl.dsp.exec_cmd(noctalia .. "session lock"))
+hl.bind("ALT + Tab",                   hl.dsp.exec_cmd(noctalia .. "window-switcher hold"))
+hl.bind("ALT + SHIFT + Tab",           hl.dsp.exec_cmd(noctalia .. "window-switcher hold reverse"))
 
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
@@ -292,10 +305,6 @@ for i = 1, 10 do
     hl.bind(mainMod .. " + SHIFT + " .. key,     hl.dsp.window.move({ workspace = i }))
 end
 
--- Example special workspace (scratchpad)
-hl.bind(mainMod .. " + S",         hl.dsp.workspace.toggle_special("magic"))
-hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:magic" }))
-
 -- Scroll through existing workspaces with mainMod + scroll
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
 hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
@@ -304,19 +313,19 @@ hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
--- Laptop multimedia keys for volume and LCD brightness
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),      { locked = true, repeating = true })
-hl.bind("XF86AudioMute",        hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),     { locked = true, repeating = true })
-hl.bind("XF86AudioMicMute",     hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),   { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessUp",  hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"),                  { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown",hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"),                  { locked = true, repeating = true })
-
--- Requires playerctl
-hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("playerctl next"),       { locked = true })
-hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-hl.bind("XF86AudioPlay",  hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("playerctl previous"),   { locked = true })
+-- Volume, brightness and media keys through Noctalia, so its on-screen popups show.
+-- locked = true keeps them working on the lock screen.
+hl.bind("XF86AudioRaiseVolume",  hl.dsp.exec_cmd(noctalia .. "volume-up"),       { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume",  hl.dsp.exec_cmd(noctalia .. "volume-down"),     { locked = true, repeating = true })
+hl.bind("XF86AudioMute",         hl.dsp.exec_cmd(noctalia .. "volume-mute"),     { locked = true })
+hl.bind("XF86AudioMicMute",      hl.dsp.exec_cmd(noctalia .. "mic-mute"),        { locked = true })
+hl.bind("XF86MonBrightnessUp",   hl.dsp.exec_cmd(noctalia .. "brightness-up"),   { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(noctalia .. "brightness-down"), { locked = true, repeating = true })
+hl.bind("XF86AudioPlay",         hl.dsp.exec_cmd(noctalia .. "media toggle"),    { locked = true })
+hl.bind("XF86AudioPause",        hl.dsp.exec_cmd(noctalia .. "media toggle"),    { locked = true })
+hl.bind("XF86AudioStop",         hl.dsp.exec_cmd(noctalia .. "media stop"),      { locked = true })
+hl.bind("XF86AudioPrev",         hl.dsp.exec_cmd(noctalia .. "media previous"),  { locked = true })
+hl.bind("XF86AudioNext",         hl.dsp.exec_cmd(noctalia .. "media next"),      { locked = true })
 
 
 --------------------------------
@@ -358,6 +367,22 @@ hl.window_rule({
 --     no_anim = true,
 -- })
 -- overlayLayerRule:set_enabled(false)
+
+-- Noctalia's bar and panels animate themselves. Hyprland's layer animations on top of them cause
+-- glitches, such as a panel tearing when reopened while it's closing.
+hl.layer_rule({
+    name  = "noctalia-no-anim",
+    match = { namespace = "^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd|window-switcher)$" },
+    no_anim = true,
+})
+
+-- The Noctalia settings window floats
+hl.window_rule({
+    name  = "noctalia-settings",
+    match = { class = "dev.noctalia.Noctalia" },
+    float = true,
+    size  = { 1080, 920 },
+})
 
 -- Hyprland-run windowrule
 hl.window_rule({
