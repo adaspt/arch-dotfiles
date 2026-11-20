@@ -20,6 +20,8 @@ local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 -- 1. Applications
 
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(terminal), { description = "Terminal" })
+-- Super+Enter as on Omarchy and most tiling setups
+hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd(terminal), { description = "Terminal" })
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager), { description = "File manager" })
 
 -- Noctalia's launcher and control center, as on niri. Its settings open from the gear in the
