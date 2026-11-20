@@ -61,6 +61,7 @@ It asks for your sudo password. It then:
 - enables linger, so tmux sessions and OneDrive keep running after you log out
 - links the config files in `config/home/` into `~`
 - sets Loupe as the default app for images, and mpv for video and audio
+- creates the home folders (Downloads, Documents, ...)
 - tells VS Code to keep secrets in the keyring, as it doesn't recognise Hyprland
 - enables the SSH agent
 - sets up the Noctalia login screen, which unlocks the keyring

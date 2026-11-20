@@ -72,6 +72,8 @@ system_setup() {
         # Noctalia login screen
         hyprland xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
         noctalia noctalia-greeter
+        # Lets Qt apps (qBittorrent) run natively on Wayland, instead of blurry through XWayland
+        qt6-wayland
         # Shell, and the tools .zshrc uses
         zsh zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search
         tmux eza fzf zoxide yazi
@@ -138,6 +140,10 @@ system_setup() {
         echo "$hypr_check" >&2
         exit 1
     fi
+
+    # GNOME creates these at login, Hyprland doesn't
+    echo "==> Creating Downloads, Documents, Music, Videos and the other home folders"
+    xdg-user-dirs-update
 
     # Every file type each app's .desktop file lists, so images don't open in Chrome
     echo "==> Setting Loupe for images and mpv for video and audio"
