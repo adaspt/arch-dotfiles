@@ -383,9 +383,14 @@ end
 hl.bind(mainMod .. " + grave",         hl.dsp.workspace.toggle_special("scratchpad"))
 hl.bind(mainMod .. " + SHIFT + grave", hl.dsp.window.move({ workspace = "special:scratchpad" }))
 
--- Scroll through existing workspaces with mainMod + scroll
-hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
-hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
+-- Next or previous workspace on this monitor (m+1/m-1), as on niri and GNOME. With Shift, the active
+-- window moves there. Super + mouse wheel does the same.
+hl.bind(mainMod .. " + Page_Down",         hl.dsp.focus({ workspace = "m+1" }))
+hl.bind(mainMod .. " + Page_Up",           hl.dsp.focus({ workspace = "m-1" }))
+hl.bind(mainMod .. " + SHIFT + Page_Down", hl.dsp.window.move({ workspace = "m+1" }))
+hl.bind(mainMod .. " + SHIFT + Page_Up",   hl.dsp.window.move({ workspace = "m-1" }))
+hl.bind(mainMod .. " + mouse_down",        hl.dsp.focus({ workspace = "m+1" }))
+hl.bind(mainMod .. " + mouse_up",          hl.dsp.focus({ workspace = "m-1" }))
 
 -- Move/resize windows with mainMod + LMB/RMB and dragging
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
