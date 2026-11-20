@@ -314,6 +314,11 @@ hl.bind(mainMod .. " + Escape",        hl.dsp.exec_cmd(noctalia .. "panel-toggle
 
 -- Clipboard history, as on Windows and Omarchy
 hl.bind(mainMod .. " + V",             hl.dsp.exec_cmd(noctalia .. "panel-toggle clipboard"))
+
+-- Notifications, as the bell in the bar: Super+N shows them (Win+N on Windows),
+-- Super+Shift+N clears them, both the ones on screen and the history
+hl.bind(mainMod .. " + N",             hl.dsp.exec_cmd(noctalia .. "panel-toggle control-center notifications"))
+hl.bind(mainMod .. " + SHIFT + N",     hl.dsp.exec_cmd(noctalia .. "notification-clear-active; " .. noctalia .. "notification-clear-history"))
 -- The power button opens the same menu. systemd ignores it (config/etc/systemd/logind.conf.d).
 hl.bind("XF86PowerOff",                hl.dsp.exec_cmd(noctalia .. "panel-toggle session"))
 
