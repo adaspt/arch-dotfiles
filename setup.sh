@@ -79,8 +79,8 @@ system_setup() {
         age
         # CLI tools
         less bat btop htop fd ripgrep 7zip wl-clipboard
-        # Apps
-        qbittorrent
+        # Apps. Nautilus is the file manager on Super+E
+        nautilus qbittorrent
         # Coding agents
         openai-codex
     )

@@ -29,7 +29,7 @@ hl.monitor({
 
 -- Set programs that you use
 local terminal    = "ghostty"
-local fileManager = "dolphin"
+local fileManager = "nautilus"
 
 -- Noctalia (bar, launcher, notifications, lock screen, wallpaper) takes commands through this
 local noctalia    = "noctalia msg "
@@ -235,7 +235,8 @@ hl.config({
 
 hl.config({
     input = {
-        kb_layout  = "us",
+        -- US and Lithuanian, switched with Super+Shift+Space (see the binds)
+        kb_layout  = "us,lt",
         kb_variant = "",
         kb_model   = "",
         kb_options = "",
@@ -290,6 +291,9 @@ hl.bind(mainMod .. " + SHIFT + comma", hl.dsp.exec_cmd(noctalia .. "settings-tog
 hl.bind(mainMod .. " + ALT + L",       hl.dsp.exec_cmd(noctalia .. "session lock"))
 hl.bind("ALT + Tab",                   hl.dsp.exec_cmd(noctalia .. "window-switcher hold"))
 hl.bind("ALT + SHIFT + Tab",           hl.dsp.exec_cmd(noctalia .. "window-switcher hold reverse"))
+
+-- Super+Space is the launcher, so the keyboard layout switch (us/lt) is here, as on niri
+hl.bind(mainMod .. " + SHIFT + space", hl.dsp.exec_cmd("hyprctl switchxkblayout all next"))
 
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
