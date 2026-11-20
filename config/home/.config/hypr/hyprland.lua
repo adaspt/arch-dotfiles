@@ -278,17 +278,25 @@ local closeWindowBind = hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 -- closeWindowBind:set_enabled(false)
 hl.bind(mainMod .. " + F",         hl.dsp.window.fullscreen({ mode = "maximized" }))
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
-hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 
--- Noctalia's launcher, control center, settings, lock screen and window switcher, as on niri
+-- Noctalia's launcher, control center, settings and window switcher, as on niri
 hl.bind(mainMod .. " + space",         hl.dsp.exec_cmd(noctalia .. "panel-toggle launcher"))
 hl.bind(mainMod .. " + S",             hl.dsp.exec_cmd(noctalia .. "panel-toggle control-center"))
 hl.bind(mainMod .. " + SHIFT + comma", hl.dsp.exec_cmd(noctalia .. "settings-toggle"))
-hl.bind(mainMod .. " + ALT + L",       hl.dsp.exec_cmd(noctalia .. "session lock"))
+
+-- Lock as on Windows, GNOME and KDE. The session menu (lock, suspend, log out, reboot, shut down)
+-- replaces Hyprland's Super+M, which quit at once without asking.
+hl.bind(mainMod .. " + L",             hl.dsp.exec_cmd(noctalia .. "session lock"))
+hl.bind(mainMod .. " + Escape",        hl.dsp.exec_cmd(noctalia .. "panel-toggle session"))
+
+-- Screenshot of a region you select, copied to the clipboard and saved to a file.
+-- Super+Shift+S as on Windows and niri, for keyboards without a Print key.
+hl.bind("Print",                       hl.dsp.exec_cmd(noctalia .. "screenshot-region"))
+hl.bind(mainMod .. " + SHIFT + S",     hl.dsp.exec_cmd(noctalia .. "screenshot-region"))
 hl.bind("ALT + Tab",                   hl.dsp.exec_cmd(noctalia .. "window-switcher hold"))
 hl.bind("ALT + SHIFT + Tab",           hl.dsp.exec_cmd(noctalia .. "window-switcher hold reverse"))
 
@@ -308,6 +316,11 @@ for i = 1, 10 do
     hl.bind(mainMod .. " + " .. key,             hl.dsp.focus({ workspace = i}))
     hl.bind(mainMod .. " + SHIFT + " .. key,     hl.dsp.window.move({ workspace = i }))
 end
+
+-- Scratchpad: a workspace shown over the current one. Super+` shows or hides it,
+-- Super+Shift+` moves the active window into it.
+hl.bind(mainMod .. " + grave",         hl.dsp.workspace.toggle_special("scratchpad"))
+hl.bind(mainMod .. " + SHIFT + grave", hl.dsp.window.move({ workspace = "special:scratchpad" }))
 
 -- Scroll through existing workspaces with mainMod + scroll
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
