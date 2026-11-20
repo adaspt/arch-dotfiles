@@ -31,6 +31,11 @@ behavior_order = [ "screen-off", "lock", "lock-and-suspend" ]
 [location]
 address = "Kaunas, Lithuania"
 
+# Keybind cheat sheet on Super+Shift+/ (hyprland.lua). Noctalia fetches it from its community
+# plugins repo. It reads the binds from Hyprland, and their descriptions from hyprland.lua.
+[plugins]
+enabled = ["kenn/keybind-cheatsheet"]
+
 # Shows the password window when an app needs admin rights (polkit), e.g. fwupd or mounting a disk
 [shell]
 polkit_agent = true

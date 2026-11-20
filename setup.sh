@@ -79,8 +79,8 @@ system_setup() {
         age
         # CLI tools
         less bat btop htop fd ripgrep 7zip wl-clipboard
-        # Apps. Nautilus is the file manager on Super+E
-        nautilus gnome-text-editor qbittorrent
+        # Apps. Nautilus is the file manager on Super+E. Loupe opens images, mpv video and audio.
+        nautilus gnome-text-editor loupe mpv qbittorrent
         # Coding agents
         openai-codex
     )
@@ -88,7 +88,7 @@ system_setup() {
 
     # Copied, not linked: files in /etc have to be owned by root. After the install, as greetd's
     # files would otherwise conflict with it.
-    echo "==> Copying system config (greetd, PAM keyring unlock)"
+    echo "==> Copying system config (greetd, PAM keyring unlock, power button)"
     sudo cp -r "$REPO_DIR/config/etc/." /etc/
 
     # fstrim is for the FAT32 /boot: btrfs already trims with discard=async. btrfs-scrub@- scrubs /.
@@ -138,6 +138,14 @@ system_setup() {
         echo "$hypr_check" >&2
         exit 1
     fi
+
+    # Every file type each app's .desktop file lists, so images don't open in Chrome
+    echo "==> Setting Loupe for images and mpv for video and audio"
+    local desktop mimes
+    for desktop in org.gnome.Loupe.desktop mpv.desktop; do
+        IFS=';' read -ra mimes < <(sed -n 's/^MimeType=//p' "/usr/share/applications/$desktop")
+        xdg-mime default "$desktop" "${mimes[@]}"
+    done
 
     echo "==> Telling VS Code to keep secrets in gnome-keyring"
     mkdir -p "$HOME/.vscode"

@@ -279,7 +279,8 @@ local closeWindowBind = hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 hl.bind(mainMod .. " + F",         hl.dsp.window.fullscreen({ mode = "maximized" }))
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
-hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
+-- Super+V is clipboard history (below), so floating is on Super+Shift+V
+hl.bind(mainMod .. " + SHIFT + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 
@@ -292,6 +293,14 @@ hl.bind(mainMod .. " + SHIFT + comma", hl.dsp.exec_cmd(noctalia .. "settings-tog
 -- replaces Hyprland's Super+M, which quit at once without asking.
 hl.bind(mainMod .. " + L",             hl.dsp.exec_cmd(noctalia .. "session lock"))
 hl.bind(mainMod .. " + Escape",        hl.dsp.exec_cmd(noctalia .. "panel-toggle session"))
+
+-- Clipboard history, as on Windows and Omarchy
+hl.bind(mainMod .. " + V",             hl.dsp.exec_cmd(noctalia .. "panel-toggle clipboard"))
+-- The power button opens the same menu. systemd ignores it (config/etc/systemd/logind.conf.d).
+hl.bind("XF86PowerOff",                hl.dsp.exec_cmd(noctalia .. "panel-toggle session"))
+
+-- Cheat sheet of all these keys (Noctalia's keybind-cheatsheet plugin), on Super+? as on niri
+hl.bind(mainMod .. " + SHIFT + slash", hl.dsp.exec_cmd(noctalia .. "panel-toggle kenn/keybind-cheatsheet:cheatsheet"))
 
 -- Screenshot of a region you select, copied to the clipboard and saved to a file.
 -- Super+Shift+S as on Windows and niri, for keyboards without a Print key.
@@ -315,10 +324,31 @@ hl.bind(mainMod .. " + SHIFT + right", hl.dsp.window.swap({ direction = "right" 
 hl.bind(mainMod .. " + SHIFT + up",    hl.dsp.window.swap({ direction = "up" }))
 hl.bind(mainMod .. " + SHIFT + down",  hl.dsp.window.swap({ direction = "down" }))
 
+-- Switches the current workspace between dwindle and the niri-like scrolling layout, as Super+L
+-- does on Omarchy. Other workspaces keep theirs. Back to dwindle on login or config reload.
+hl.bind(mainMod .. " + CTRL + L", function()
+    local ws = hl.get_active_workspace()
+    if not ws or not ws.id then return end
+    local layout = ws.tiled_layout == "scrolling" and "dwindle" or "scrolling"
+    hl.workspace_rule({ workspace = tostring(ws.id), layout = layout })
+    hl.exec_cmd(noctalia .. "notification-show 'Workspace " .. ws.id .. " layout: " .. layout .. "'")
+end)
+
 -- Resize the active window by 100px, as on Omarchy: Minus/Equal for width, with Shift for height.
--- Held down, they keep resizing.
-hl.bind(mainMod .. " + minus",         hl.dsp.window.resize({ x = -100, y = 0, relative = true }), { repeating = true })
-hl.bind(mainMod .. " + equal",         hl.dsp.window.resize({ x = 100,  y = 0, relative = true }), { repeating = true })
+-- Held down, they keep resizing. In dwindle the width keys move the window's border left or right;
+-- in the scrolling layout they make the column 10% of the screen narrower or wider, as on niri.
+local function resizeWidth(px, fraction)
+    return function()
+        local ws = hl.get_active_workspace()
+        if ws and ws.tiled_layout == "scrolling" then
+            hl.dispatch(hl.dsp.layout("colresize " .. fraction))
+        else
+            hl.dispatch(hl.dsp.window.resize({ x = px, y = 0, relative = true }))
+        end
+    end
+end
+hl.bind(mainMod .. " + minus",         resizeWidth(-100, "-0.1"), { repeating = true })
+hl.bind(mainMod .. " + equal",         resizeWidth(100, "+0.1"),  { repeating = true })
 hl.bind(mainMod .. " + SHIFT + minus", hl.dsp.window.resize({ x = 0, y = -100, relative = true }), { repeating = true })
 hl.bind(mainMod .. " + SHIFT + equal", hl.dsp.window.resize({ x = 0, y = 100,  relative = true }), { repeating = true })
 
