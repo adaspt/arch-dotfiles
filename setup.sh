@@ -80,7 +80,7 @@ system_setup() {
         # CLI tools
         less bat btop htop fd ripgrep 7zip wl-clipboard
         # Apps. Nautilus is the file manager on Super+E
-        nautilus qbittorrent
+        nautilus gnome-text-editor qbittorrent
         # Coding agents
         openai-codex
     )
