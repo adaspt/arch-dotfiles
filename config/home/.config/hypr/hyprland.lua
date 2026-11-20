@@ -230,6 +230,15 @@ hl.config({
     },
 })
 
+-- Don't switch a monitor to HDR when a fullscreen app (e.g. a YouTube video) asks for it. The Dell
+-- S2722QC says it supports HDR but isn't bright enough for it, and runs in 8-bit, so Hyprland warned
+-- that the display is not in 10-bit mode.
+hl.config({
+    render = {
+        cm_auto_hdr = 0,
+    },
+})
+
 
 ----------------
 ---- LAYERS ----
