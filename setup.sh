@@ -18,9 +18,6 @@ main() {
     # The keyring, unlocked by the login screen, and GNOME settings need the GNOME session
     [[ ${XDG_CURRENT_DESKTOP:-} == *GNOME* ]] || die "Run this from a terminal in GNOME."
 
-    # Piped from curl, stdin is this script; the prompts need the terminal
-    exec < /dev/tty
-
     system_setup
     gnome_setup
     onedrive_setup
@@ -213,4 +210,6 @@ unlock_secrets() {
     mv "$SECRETS_DIR.part" "$SECRETS_DIR"
 }
 
-main "$@"
+# Piped from curl, stdin is this script, and the prompts need the terminal.
+# Only main's stdin, as bash reads the rest of the script from its own stdin after main
+main "$@" < /dev/tty
