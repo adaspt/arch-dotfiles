@@ -9,6 +9,10 @@
 -- Programs the binds start
 local terminal    = "ghostty"
 local fileManager = "nautilus"
+local browser     = "google-chrome-stable"
+local codeEditor  = "code"
+local textEditor  = "gnome-text-editor"
+local aiAgent     = "t3code"
 
 -- Noctalia (bar, launcher, notifications, lock screen, wallpaper) takes commands through this
 local noctalia    = "noctalia msg "
@@ -23,11 +27,17 @@ hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(terminal), { description = "Terminal"
 -- Super+Enter as on Omarchy and most tiling setups
 hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd(terminal), { description = "Terminal" })
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager), { description = "File manager" })
+-- Super+Shift+B as on Omarchy
+hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd(browser), { description = "Browser" })
+-- C for code, N for notepad (Super+Shift+N is the editor on Omarchy too), A for AI
+hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd(codeEditor), { description = "VS Code" })
+hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd(textEditor), { description = "Text Editor" })
+hl.bind(mainMod .. " + SHIFT + A", hl.dsp.exec_cmd(aiAgent), { description = "T3 Code" })
 
--- Noctalia's launcher and control center, as on niri. Its settings open from the gear in the
--- control center.
+-- Noctalia's launcher and control center. Super+S is the scratchpad, as on Omarchy, so the control
+-- center is on Super+`. Its settings open from the gear in the control center.
 hl.bind(mainMod .. " + space",         hl.dsp.exec_cmd(noctalia .. "panel-toggle launcher"), { description = "App launcher" })
-hl.bind(mainMod .. " + S",             hl.dsp.exec_cmd(noctalia .. "panel-toggle control-center"), { description = "Control center" })
+hl.bind(mainMod .. " + grave",         hl.dsp.exec_cmd(noctalia .. "panel-toggle control-center"), { description = "Control center" })
 
 -- Clipboard history, as on Windows and Omarchy
 hl.bind(mainMod .. " + V",             hl.dsp.exec_cmd(noctalia .. "panel-toggle clipboard"), { description = "Clipboard history" })
@@ -142,10 +152,10 @@ hl.bind(mainMod .. " + SHIFT + Page_Up",   hl.dsp.window.move({ workspace = "m-1
 hl.bind(mainMod .. " + mouse_down",        hl.dsp.focus({ workspace = "m+1" }), { description = "Next workspace on this monitor" })
 hl.bind(mainMod .. " + mouse_up",          hl.dsp.focus({ workspace = "m-1" }), { description = "Previous workspace on this monitor" })
 
--- Scratchpad: a workspace shown over the current one. Super+` shows or hides it,
--- Super+Shift+` moves the active window into it.
-hl.bind(mainMod .. " + grave",         hl.dsp.workspace.toggle_special("scratchpad"), { description = "Toggle scratchpad" })
-hl.bind(mainMod .. " + SHIFT + grave", hl.dsp.window.move({ workspace = "special:scratchpad" }), { description = "Move window to scratchpad" })
+-- Scratchpad: a workspace shown over the current one. Super+S shows or hides it, as on Omarchy.
+-- Super+Alt+S moves the active window into it (Super+Shift+S is the screenshot).
+hl.bind(mainMod .. " + S",             hl.dsp.workspace.toggle_special("scratchpad"), { description = "Toggle scratchpad" })
+hl.bind(mainMod .. " + ALT + S",       hl.dsp.window.move({ workspace = "special:scratchpad" }), { description = "Move window to scratchpad" })
 
 -- 6. Media and brightness
 

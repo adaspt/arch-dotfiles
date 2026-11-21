@@ -352,6 +352,21 @@ hl.window_rule({
     size  = { 1080, 920 },
 })
 
+-- Chrome opens on workspace 3 (the right monitor), however it's started: Super+Shift+B, the
+-- launcher or a link. Every new Chrome window goes there and is focused.
+hl.window_rule({
+    name      = "chrome-on-workspace-3",
+    match     = { class = "^google-chrome$" },
+    workspace = "3",
+})
+
+-- VS Code opens on workspace 2 (the middle monitor) the same way
+hl.window_rule({
+    name      = "vscode-on-workspace-2",
+    match     = { class = "^(code|Code|com\\.microsoft\\.VSCode)$" },
+    workspace = "2",
+})
+
 -- Hyprland-run windowrule
 hl.window_rule({
     name  = "move-hyprland-run",

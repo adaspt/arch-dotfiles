@@ -7,7 +7,7 @@ config_version = 20
 margin_ends = 0
 radius = 0
 # The default right side without "media": a changing song title is distracting. What's playing
-# is in the control center (Super+S).
+# is in the control center (Super+`).
 end = [
     "tray", "notifications", "clipboard", "network", "bluetooth", "volume", "brightness",
     "battery", "control-center", "session",
