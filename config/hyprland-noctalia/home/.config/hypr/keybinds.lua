@@ -56,7 +56,7 @@ hl.bind(mainMod .. " + SHIFT + slash", hl.dsp.exec_cmd(noctalia .. "panel-toggle
 -- replaces Hyprland's Super+M, which quit at once without asking.
 hl.bind(mainMod .. " + L",             hl.dsp.exec_cmd(noctalia .. "session lock"), { description = "Lock screen" })
 hl.bind(mainMod .. " + Escape",        hl.dsp.exec_cmd(noctalia .. "panel-toggle session"), { description = "Session menu" })
--- The power button opens the same menu. systemd ignores it (config/etc/systemd/logind.conf.d).
+-- The power button opens the same menu. systemd ignores it (config/hyprland-noctalia/etc/systemd/logind.conf.d).
 hl.bind("XF86PowerOff",                hl.dsp.exec_cmd(noctalia .. "panel-toggle session"), { description = "Session menu" })
 
 -- Super+Space is the launcher, so the keyboard layout switch (us/lt) is here, as on niri

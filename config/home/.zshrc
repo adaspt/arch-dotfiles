@@ -62,6 +62,12 @@ zstyle ':completion:*' rehash true
 export EDITOR='nano'
 
 
+# ---------- SSH agent ----------
+# gcr-ssh-agent, which saves key passphrases in the keyring. Set here for desktops that don't pass
+# on the systemd user environment, where gcr sets it.
+[[ -n $SSH_AUTH_SOCK ]] || export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gcr/ssh"
+
+
 # ---------- Aliases ----------
 alias cls='clear'
 alias ls='eza -a --color=auto --group-directories-first --icons=auto'

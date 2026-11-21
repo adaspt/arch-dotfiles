@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
-# Everything after archinstall, in two parts. Run it as your normal user:
+# Everything after archinstall and the desktop. It installs no desktop: install one first, with its
+# own installer (e.g. Dux) or setup-hyprland-noctalia.sh, then log in to it and run this from a
+# terminal, as your normal user:
+#   curl -fsSL https://raw.githubusercontent.com/adaspt/arch-dotfiles/main/setup.sh | bash
 #
-# 1. From the text login after the first boot:
-#      curl -fsSL https://raw.githubusercontent.com/adaspt/arch-dotfiles/main/setup.sh | bash
-#    Sets up the system, shell and login screen, then stops and asks for a reboot.
-# 2. After the reboot, log in on the Noctalia login screen and run it again from a terminal:
-#      ~/Projects/personal/arch-dotfiles/setup.sh
-#    Sets up OneDrive (signing in needs a browser), and SSH keys, VPN and fonts from it.
+# It runs in two parts:
+# 1. Sets up the system, shell, tools and apps.
+# 2. Sets up OneDrive (signing in needs a browser), and SSH keys, VPN and fonts from it.
 #
 # Part 2 needs the desktop session because the login screen unlocks the keyring, and Chrome and
-# OneDrive should be set up with it unlocked. Safe to run again any time.
+# OneDrive should be set up with it unlocked. Run from a text login, it stops after part 1.
+# Safe to run again any time.
 set -euo pipefail
 
 FULL_NAME="Adas Petrovas"
@@ -34,8 +35,7 @@ main() {
 
     if [[ -z ${WAYLAND_DISPLAY:-} ]]; then
         echo
-        echo "Part 1 is done. Reboot (sudo reboot), log in on the Noctalia login screen,"
-        echo "open a terminal (Super+T) and run the script again:"
+        echo "Part 1 is done. Log in to your desktop, open a terminal and run the script again:"
         echo "  $REPO_DIR/setup.sh"
         exit 0
     fi
@@ -68,10 +68,6 @@ system_setup() {
         pacman-contrib fwupd
         # Realtime priority for PipeWire, so audio doesn't crackle under load
         rtkit
-        # Desktop: Hyprland, Noctalia (bar, launcher, notifications, lock screen, wallpaper) and the
-        # Noctalia login screen
-        hyprland xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
-        noctalia noctalia-greeter
         # Lets Qt apps (qBittorrent) run natively on Wayland, instead of blurry through XWayland
         qt6-wayland
         # Shell, and the tools .zshrc uses
@@ -90,7 +86,7 @@ system_setup() {
 
     # Copied, not linked: files in /etc have to be owned by root. After the install, as greetd's
     # files would otherwise conflict with it.
-    echo "==> Copying system config (greetd, PAM keyring unlock, power button)"
+    echo "==> Copying system config (keyring unlock at the greetd login screen)"
     sudo cp -r "$REPO_DIR/config/etc/." /etc/
 
     # fstrim is for the FAT32 /boot: btrfs already trims with discard=async. btrfs-scrub@- scrubs /.
@@ -135,13 +131,8 @@ system_setup() {
         ln -sfn "$file" "$HOME/$rel"
     done < <(find "$REPO_DIR/config/home" -type f -print0)
     chmod 700 "$HOME/.ssh"
-    local hypr_check
-    if ! hypr_check=$(Hyprland --verify-config -c "$HOME/.config/hypr/hyprland.lua" 2>&1); then
-        echo "$hypr_check" >&2
-        exit 1
-    fi
 
-    # GNOME creates these at login, Hyprland doesn't
+    # GNOME creates these at login, other desktops may not
     echo "==> Creating Downloads, Documents, Music, Videos and the other home folders"
     xdg-user-dirs-update
 
@@ -153,16 +144,13 @@ system_setup() {
         xdg-mime default "$desktop" "${mimes[@]}"
     done
 
+    # VS Code only finds the keyring by itself on GNOME and KDE
     echo "==> Telling VS Code to keep secrets in gnome-keyring"
     mkdir -p "$HOME/.vscode"
     [[ -f "$HOME/.vscode/argv.json" ]] || cp "$REPO_DIR/config/vscode/argv.json" "$HOME/.vscode/argv.json"
 
     echo "==> Enabling the SSH agent"
     systemctl --user enable gcr-ssh-agent.socket
-
-    echo "==> Enabling the login screen"
-    sudo noctalia-greeter-apply-appearance --setup-system
-    sudo systemctl enable greetd
 }
 
 # ---------- Part 2: in the desktop session ----------
