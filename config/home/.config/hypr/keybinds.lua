@@ -62,10 +62,10 @@ hl.bind("XF86PowerOff",                hl.dsp.exec_cmd(noctalia .. "panel-toggle
 -- Super+Space is the launcher, so the keyboard layout switch (us/lt) is here, as on niri
 hl.bind(mainMod .. " + SHIFT + space", hl.dsp.exec_cmd("hyprctl switchxkblayout all next"), { description = "Switch keyboard layout (US/LT)" })
 
--- Notifications on Comma, as on Omarchy. Super+Comma dismisses the ones on screen (Noctalia can't
--- dismiss just the latest), Super+Shift+Comma also clears the history, and Super+Alt+Comma does what
--- clicking the latest one does (opens the chat, the downloaded file, ...). The bell in the bar shows them.
-hl.bind(mainMod .. " + comma",         hl.dsp.exec_cmd(noctalia .. "notification-clear-active"), { description = "Dismiss notifications on screen" })
+-- Notifications on Comma, as on Omarchy. Super+Comma shows the list (the notifications tab of the
+-- control center, like the bell in the bar), Super+Shift+Comma clears them all, and Super+Alt+Comma
+-- does what clicking the latest one does (opens the chat, the downloaded file, ...).
+hl.bind(mainMod .. " + comma",         hl.dsp.exec_cmd(noctalia .. "panel-toggle control-center notifications"), { description = "Notifications" })
 hl.bind(mainMod .. " + SHIFT + comma", hl.dsp.exec_cmd(noctalia .. "notification-clear-active; " .. noctalia .. "notification-clear-history"), { description = "Clear all notifications" })
 hl.bind(mainMod .. " + ALT + comma",   hl.dsp.exec_cmd(noctalia .. "notification-invoke-latest"), { description = "Open latest notification" })
 
