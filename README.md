@@ -64,7 +64,7 @@ It asks for your sudo password, and stops if it isn't run from GNOME. It:
 - enables the SSH agent
 - clones my GNOME extensions (launcher, window-keys) to `~/Projects/personal` and links them into GNOME
 - applies the GNOME settings in `config/gnome.ini`: keyboard layouts, shortcuts, dock apps, extensions,
-  screen lock and suspend timeouts
+  screen lock and suspend timeouts, weather location
 - keeps the login screen's monitor layout the same as yours, every time Settings > Displays saves it
 - limits battery charging to preserve battery health, where the battery supports it
 - signs you in to OneDrive: open the link it prints in Chrome, sign in, and paste the address of the blank page you land on
@@ -96,7 +96,7 @@ It installs the .NET SDK 10 with ASP.NET Core, the EF Core tools (`dotnet ef`), 
 
 ## Gaming
 
-On machines for gaming, run this from a terminal in the desktop session, after `setup.sh`:
+On machines for gaming, run this from a terminal in GNOME, after `setup.sh`:
 
 ```sh
 ~/Projects/personal/arch-dotfiles/setup-gaming.sh

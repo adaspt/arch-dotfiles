@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
-# Steam and GeForce NOW. Run it from a terminal in the desktop session, after both parts of
-# setup.sh. Safe to run again any time.
+# Steam and GeForce NOW. Run it from a terminal in GNOME, after setup.sh. Safe to run again any time.
 set -euo pipefail
 
 if [[ $EUID -eq 0 ]]; then
     echo "Run this as your normal user, not root." >&2
     exit 1
 fi
-if [[ -z ${WAYLAND_DISPLAY:-} ]]; then
-    echo "Run this from a terminal in the desktop session." >&2
+if [[ ${XDG_CURRENT_DESKTOP:-} != *GNOME* ]]; then
+    echo "Run this from a terminal in GNOME, not from a text login or over SSH." >&2
     exit 1
 fi
 

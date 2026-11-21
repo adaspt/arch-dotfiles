@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Development tools for machines that build code locally: .NET, Azure and Node.js.
-# Run it after part 1 of setup.sh, which installs paru. Safe to run again any time.
+# Run it after setup.sh, which installs paru. Safe to run again any time.
 set -euo pipefail
 
 if [[ $EUID -eq 0 ]]; then

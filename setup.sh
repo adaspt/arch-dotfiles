@@ -72,7 +72,7 @@ system_setup() {
         # Decrypts the secrets archive from OneDrive
         age
         # CLI tools
-        less bat btop htop fd ripgrep 7zip wl-clipboard
+        less bat btop htop fd ripgrep jq rsync lazygit 7zip wl-clipboard
         # Apps beyond GNOME's own. mpv opens video and audio. Gradia takes screenshots on Shift+Super+S.
         mpv qbittorrent gradia
         # GNOME extensions, enabled by config/gnome.ini
