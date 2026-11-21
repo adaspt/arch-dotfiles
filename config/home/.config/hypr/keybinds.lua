@@ -143,12 +143,14 @@ for i = 1, 10 do
     hl.bind(mainMod .. " + SHIFT + " .. key,     hl.dsp.window.move({ workspace = i }), { description = "Move window to workspace " .. i })
 end
 
--- Next or previous workspace on this monitor (m+1/m-1), as on niri and GNOME. With Shift, the active
--- window moves there. Super + mouse wheel does the same.
+-- Next or previous workspace on this monitor (m+1/m-1), as on niri and GNOME. Super + mouse wheel
+-- does the same. With Shift, the active window moves to the next workspace number that is on this
+-- monitor or doesn't exist yet (r+1/r-1), so from workspace 2 it skips 3 (the right monitor) and
+-- creates 4 here.
 hl.bind(mainMod .. " + Page_Down",         hl.dsp.focus({ workspace = "m+1" }), { description = "Next workspace on this monitor" })
 hl.bind(mainMod .. " + Page_Up",           hl.dsp.focus({ workspace = "m-1" }), { description = "Previous workspace on this monitor" })
-hl.bind(mainMod .. " + SHIFT + Page_Down", hl.dsp.window.move({ workspace = "m+1" }), { description = "Move window to next workspace on this monitor" })
-hl.bind(mainMod .. " + SHIFT + Page_Up",   hl.dsp.window.move({ workspace = "m-1" }), { description = "Move window to previous workspace on this monitor" })
+hl.bind(mainMod .. " + SHIFT + Page_Down", hl.dsp.window.move({ workspace = "r+1" }), { description = "Move window to next workspace on this monitor" })
+hl.bind(mainMod .. " + SHIFT + Page_Up",   hl.dsp.window.move({ workspace = "r-1" }), { description = "Move window to previous workspace on this monitor" })
 hl.bind(mainMod .. " + mouse_down",        hl.dsp.focus({ workspace = "m+1" }), { description = "Next workspace on this monitor" })
 hl.bind(mainMod .. " + mouse_up",          hl.dsp.focus({ workspace = "m-1" }), { description = "Previous workspace on this monitor" })
 
