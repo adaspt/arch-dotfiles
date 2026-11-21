@@ -6,6 +6,8 @@ Arch Linux with GNOME on a Framework laptop (Intel).
 - `setup.sh`: everything after archinstall: system, shell, tools, apps, OneDrive and secrets
 - `setup-dev.sh`: development tools, run by hand on machines that need them
 - `setup-gaming.sh`: Steam and GeForce NOW, run by hand on machines that need them
+- `config/gnome.ini`: GNOME settings, which `setup.sh` loads with `dconf load`
+- `config/etc/`: files that `setup.sh` copies to `/etc`
 - `config/home/`: files that `setup.sh` symlinks into `~`, so editing them in `~` edits the repo
 - `config/onedrive/`: OneDrive client config, copied once to `~/.config/onedrive`
 
@@ -45,12 +47,13 @@ open a terminal (press **Super**, type `ghostty`) and run:
 curl -fsSL https://raw.githubusercontent.com/adaspt/arch-dotfiles/main/setup.sh | bash
 ```
 
-It asks for your sudo password. It first:
+It asks for your sudo password, and stops if it isn't run from GNOME. It:
 
 - clones this repo to `~/Projects/personal/arch-dotfiles`
 - sets up Snapper snapshots of `/`, with automatic cleanup of old ones
 - updates the system and installs zsh with its plugins, CLI tools, `age`, `pacman-contrib`, `fwupd`,
-  mpv, qBittorrent and Codex
+  mpv, qBittorrent, Gradia, Codex, and the AppIndicator and Caffeine GNOME extensions
+- copies the systemd units that copy your monitor layout to the login screen to `/etc`
 - enables timers for SSD TRIM, pacman cache cleanup and a monthly btrfs scrub
 - installs paru, then Google Chrome, VS Code, powerlevel10k, the OneDrive client and T3 Code from the AUR
 - installs Claude Code with its own installer, so it updates itself
@@ -59,21 +62,27 @@ It asks for your sudo password. It first:
 - links the config files in `config/home/` into `~`
 - sets Loupe as the default app for images, and mpv for video and audio
 - enables the SSH agent
-
-Then it:
-
+- clones my GNOME extensions (launcher, window-keys) to `~/Projects/personal` and links them into GNOME
+- applies the GNOME settings in `config/gnome.ini`: keyboard layouts, shortcuts, dock apps, extensions,
+  screen lock and suspend timeouts
+- keeps the login screen's monitor layout the same as yours, every time Settings > Displays saves it
+- limits battery charging to preserve battery health, where the battery supports it
 - signs you in to OneDrive: open the link it prints in Chrome, sign in, and paste the address of the blank page you land on
 - syncs `Backup/` from OneDrive, then starts the OneDrive service, which syncs the rest of the folders in `config/onedrive/sync_list` to `~/OneDrive`
 - decrypts `Backup/secrets.tar.gz.age` (it asks for the passphrase) and copies the SSH keys to `~/.ssh`
 - imports the WireGuard VPN `agersi-vpn`, which doesn't connect automatically: `nmcli connection up agersi-vpn`
 - copies the fonts in `Backup/fonts` to `~/.local/share/fonts`
-- copies the wallpaper from `Backup/` to `~/Pictures/Wallpapers`
+- copies the wallpaper from `Backup/` to `~/Pictures/Wallpapers` and sets it as the background
 
-That second half needs the desktop session because the login screen unlocks the keyring. Run from a
-text login, the script stops before it. Keep your keyring password the same as your login password.
-Your SSH key passphrases are saved in the keyring the first time you use each key.
+Then log out and back in, so GNOME Shell loads the extensions.
 
-The script is safe to run again, from `~/Projects/personal/arch-dotfiles/setup.sh`.
+It needs the GNOME session because the login screen unlocks the keyring, which Chrome and OneDrive
+use. Keep your keyring password the same as your login password. Your SSH key passphrases are saved
+in the keyring the first time you use each key.
+
+The script is safe to run again, from `~/Projects/personal/arch-dotfiles/setup.sh`. It writes the
+settings in `config/gnome.ini` again each time, so change GNOME settings there to keep them. After
+changing a file in `config/etc/`, run it to copy the file to `/etc`.
 
 ## Development tools
 

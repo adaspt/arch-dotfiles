@@ -3,13 +3,11 @@
 # as your normal user:
 #   curl -fsSL https://raw.githubusercontent.com/adaspt/arch-dotfiles/main/setup.sh | bash
 #
-# It runs in two parts:
-# 1. Sets up the system, shell, tools and apps.
-# 2. Sets up OneDrive (signing in needs a browser), and SSH keys, VPN and fonts from it.
+# It sets up the system, shell, tools and apps, then GNOME's extensions and settings, then OneDrive
+# (signing in needs a browser), and SSH keys, VPN, fonts and the wallpaper from it.
 #
-# Part 2 needs the desktop session because the login screen unlocks the keyring, and Chrome and
-# OneDrive should be set up with it unlocked. Run from a text login, it stops after part 1.
-# Safe to run again any time.
+# It needs the GNOME session: the login screen unlocks the keyring, which Chrome and OneDrive should
+# be set up with, and GNOME settings are written to the session. Safe to run again any time.
 set -euo pipefail
 
 FULL_NAME="Adas Petrovas"
@@ -27,25 +25,24 @@ main() {
         exit 1
     fi
 
+    if [[ ${XDG_CURRENT_DESKTOP:-} != *GNOME* ]]; then
+        echo "Run this from a terminal in GNOME, not from a text login or over SSH." >&2
+        exit 1
+    fi
+
     # Piped from curl, stdin is this script. The prompts (OneDrive sign-in, age passphrase) need the terminal
     exec < /dev/tty
 
     system_setup
-
-    if [[ -z ${WAYLAND_DISPLAY:-} ]]; then
-        echo
-        echo "Part 1 is done. Log in to your desktop, open a terminal and run the script again:"
-        echo "  $REPO_DIR/setup.sh"
-        exit 0
-    fi
-
-    desktop_setup
+    gnome_setup
+    personal_setup
 
     echo
-    echo "Done. OneDrive keeps syncing the rest in the background: journalctl --user -u onedrive -f"
+    echo "Done. Log out and back in, so GNOME Shell loads the extensions."
+    echo "OneDrive keeps syncing the rest in the background: journalctl --user -u onedrive -f"
 }
 
-# ---------- Part 1: needs no desktop session ----------
+# ---------- System, shell, tools and apps ----------
 system_setup() {
     if [[ ! -d "$REPO_DIR/.git" ]]; then
         echo "==> Cloning this repo to $REPO_DIR"
@@ -72,16 +69,23 @@ system_setup() {
         # Shell, and the tools .zshrc uses
         zsh zsh-autosuggestions zsh-syntax-highlighting zsh-history-substring-search
         tmux eza fzf zoxide yazi
-        # Decrypts the secrets archive in part 2
+        # Decrypts the secrets archive from OneDrive
         age
         # CLI tools
         less bat btop htop fd ripgrep 7zip wl-clipboard
-        # Apps beyond GNOME's own. mpv opens video and audio.
-        mpv qbittorrent
+        # Apps beyond GNOME's own. mpv opens video and audio. Gradia takes screenshots on Shift+Super+S.
+        mpv qbittorrent gradia
+        # GNOME extensions, enabled by config/gnome.ini
+        gnome-shell-extension-appindicator gnome-shell-extension-caffeine
         # Coding agents
         openai-codex
     )
     sudo pacman -Syu --needed --noconfirm "${packages[@]}"
+
+    # Copied, not linked: files in /etc have to be owned by root
+    echo "==> Copying system config (monitor layout for the login screen)"
+    sudo cp -r "$REPO_DIR/config/etc/." /etc/
+    sudo systemctl daemon-reload
 
     # fstrim is for the FAT32 /boot: btrfs already trims with discard=async. btrfs-scrub@- scrubs /.
     echo "==> Enabling maintenance timers"
@@ -138,8 +142,47 @@ system_setup() {
     systemctl --user enable gcr-ssh-agent.socket
 }
 
-# ---------- Part 2: in the desktop session ----------
-desktop_setup() {
+# ---------- GNOME ----------
+gnome_setup() {
+    # Cloned to personal projects and linked into the extensions folder, so they can be worked on.
+    # Over HTTPS, so no SSH key is needed yet; .gitconfig sends pushes over SSH
+    echo "==> Installing my GNOME extensions"
+    local extensions_dir="$HOME/.local/share/gnome-shell/extensions" name dir
+    mkdir -p "$extensions_dir"
+    for name in launcher window-keys; do
+        dir="$HOME/Projects/personal/gnome-shell-extension-$name"
+        if [[ ! -d "$dir/.git" ]]; then
+            git clone "https://github.com/adaspt/gnome-shell-extension-$name.git" "$dir"
+        else
+            # Local commits or changes make this fail; keep the clone as it is then
+            git -C "$dir" pull --ff-only || echo "Couldn't update $dir, keeping it as it is."
+        fi
+        # Compiled schemas are gitignored, so build them after clone and pull
+        [[ ! -d "$dir/schemas" ]] || glib-compile-schemas --strict "$dir/schemas"
+        ln -sfnT "$dir" "$extensions_dir/$name@adaspt"
+    done
+
+    echo "==> Applying GNOME settings from config/gnome.ini"
+    dconf load / < "$REPO_DIR/config/gnome.ini"
+
+    # Copies ~/.config/monitors.xml to GDM every time Settings > Displays saves it, then once now
+    # (skipped quietly while there is no layout yet)
+    echo "==> Keeping the login screen's monitor layout the same as yours"
+    sudo systemctl enable --now "gdm-monitors@$USER.path"
+    sudo systemctl start "gdm-monitors@$USER.service"
+
+    # "Preserve Battery Health" in Settings > Power. Stored by UPower, not dconf
+    echo "==> Limiting battery charge, where the battery supports it"
+    local battery
+    for battery in $(upower -e | grep battery_); do
+        upower -i "$battery" | grep -q 'charge-threshold-supported: *yes' || continue
+        gdbus call --system --dest org.freedesktop.UPower --object-path "$battery" \
+            --method org.freedesktop.UPower.Device.EnableChargeThreshold true >/dev/null
+    done
+}
+
+# ---------- OneDrive, and SSH keys, VPN, fonts and the wallpaper from it ----------
+personal_setup() {
     setup_onedrive
 
     if [[ ! -f "$HOME/.ssh/id_ed25519" ]]; then
@@ -174,11 +217,14 @@ desktop_setup() {
     fi
 
     # Copied out of OneDrive, so it stays if the original is moved or deleted
-    local wallpaper="winter-mountain-3840x2160-24311.jpg"
+    local wallpaper="winter-mountain-3840x2160-24311.jpg" key
     if [[ -f "$HOME/OneDrive/Backup/$wallpaper" ]]; then
-        echo "==> Copying the wallpaper from OneDrive"
+        echo "==> Copying the wallpaper from OneDrive and setting it as the background"
         mkdir -p "$HOME/Pictures/Wallpapers"
         cp "$HOME/OneDrive/Backup/$wallpaper" "$HOME/Pictures/Wallpapers/"
+        for key in picture-uri picture-uri-dark; do
+            gsettings set org.gnome.desktop.background "$key" "file://$HOME/Pictures/Wallpapers/$wallpaper"
+        done
     fi
 }
 
@@ -205,7 +251,7 @@ setup_onedrive() {
         fi
     fi
 
-    # Only Backup/ for now: part 2 needs it, and the full first sync can take long.
+    # Only Backup/ for now: the rest of this script needs it, and the full first sync can take long.
     # --resync because a first sync with a sync_list has no saved state yet
     echo "==> Syncing OneDrive Backup/"
     onedrive --sync --single-directory Backup --resync --resync-auth
