@@ -148,9 +148,6 @@
         "git",
         "nano",
         "openssh",
-        "vulkan-intel",
-        "intel-media-driver",
-        "gnome-keyring",
         "ghostty",
         "ttf-jetbrains-mono-nerd",
         "snap-pac",
@@ -161,12 +158,16 @@
         "parallel_downloads": 5
     },
     "profile_config": {
-        "gfx_driver": null,
-        "greeter": null,
+        "gfx_driver": "Intel (open-source)",
+        "greeter": "gdm",
         "profile": {
-            "custom_settings": {},
-            "details": [],
-            "main": "Minimal"
+            "custom_settings": {
+                "GNOME": {}
+            },
+            "details": [
+                "GNOME"
+            ],
+            "main": "Desktop"
         }
     },
     "script": null,

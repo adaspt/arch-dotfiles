@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# Everything after archinstall and the desktop. It installs no desktop: install one first, with its
-# own installer (e.g. Dux) or setup-hyprland-noctalia.sh, then log in to it and run this from a
-# terminal, as your normal user:
+# Everything after archinstall, which installs GNOME. Log in to GNOME and run this from a terminal,
+# as your normal user:
 #   curl -fsSL https://raw.githubusercontent.com/adaspt/arch-dotfiles/main/setup.sh | bash
 #
 # It runs in two parts:
@@ -77,17 +76,12 @@ system_setup() {
         age
         # CLI tools
         less bat btop htop fd ripgrep 7zip wl-clipboard
-        # Apps. Nautilus is the file manager on Super+E. Loupe opens images, mpv video and audio.
-        nautilus gnome-text-editor loupe mpv qbittorrent
+        # Apps beyond GNOME's own. mpv opens video and audio.
+        mpv qbittorrent
         # Coding agents
         openai-codex
     )
     sudo pacman -Syu --needed --noconfirm "${packages[@]}"
-
-    # Copied, not linked: files in /etc have to be owned by root. After the install, as greetd's
-    # files would otherwise conflict with it.
-    echo "==> Copying system config (keyring unlock at the greetd login screen)"
-    sudo cp -r "$REPO_DIR/config/etc/." /etc/
 
     # fstrim is for the FAT32 /boot: btrfs already trims with discard=async. btrfs-scrub@- scrubs /.
     echo "==> Enabling maintenance timers"
@@ -132,10 +126,6 @@ system_setup() {
     done < <(find "$REPO_DIR/config/home" -type f -print0)
     chmod 700 "$HOME/.ssh"
 
-    # GNOME creates these at login, other desktops may not
-    echo "==> Creating Downloads, Documents, Music, Videos and the other home folders"
-    xdg-user-dirs-update
-
     # Every file type each app's .desktop file lists, so images don't open in Chrome
     echo "==> Setting Loupe for images and mpv for video and audio"
     local desktop mimes
@@ -143,11 +133,6 @@ system_setup() {
         IFS=';' read -ra mimes < <(sed -n 's/^MimeType=//p' "/usr/share/applications/$desktop")
         xdg-mime default "$desktop" "${mimes[@]}"
     done
-
-    # VS Code only finds the keyring by itself on GNOME and KDE
-    echo "==> Telling VS Code to keep secrets in gnome-keyring"
-    mkdir -p "$HOME/.vscode"
-    [[ -f "$HOME/.vscode/argv.json" ]] || cp "$REPO_DIR/config/vscode/argv.json" "$HOME/.vscode/argv.json"
 
     echo "==> Enabling the SSH agent"
     systemctl --user enable gcr-ssh-agent.socket

@@ -1,19 +1,13 @@
 # arch-dotfiles
 
-Arch Linux on a Framework laptop (Intel). The desktop is installed separately, so it can be swapped:
-currently trying Dux, with Hyprland and Noctalia (`setup-hyprland-noctalia.sh`) to go back to.
+Arch Linux with GNOME on a Framework laptop (Intel).
 
-- `archinstall.json`: the archinstall config
-- `setup-hyprland-noctalia.sh`: the Hyprland and Noctalia desktop, with its login screen
-- `setup.sh`: everything after the desktop: system, shell, tools, apps, OneDrive and secrets
+- `archinstall.json`: the archinstall config, which installs GNOME and its login screen (GDM)
+- `setup.sh`: everything after archinstall: system, shell, tools, apps, OneDrive and secrets
 - `setup-dev.sh`: development tools, run by hand on machines that need them
 - `setup-gaming.sh`: Steam and GeForce NOW, run by hand on machines that need them
-- `config/etc/`: files that `setup.sh` copies to `/etc`
 - `config/home/`: files that `setup.sh` symlinks into `~`, so editing them in `~` edits the repo
-- `config/hyprland-noctalia/`: the Hyprland and Noctalia config, which `setup-hyprland-noctalia.sh`
-  copies to `/etc` and symlinks into `~` the same way
 - `config/onedrive/`: OneDrive client config, copied once to `~/.config/onedrive`
-- `config/vscode/`: VS Code `argv.json`, copied once to `~/.vscode`
 
 ## 1. Connect to Wi-Fi on the install USB
 
@@ -42,35 +36,10 @@ If your device isn't `wlan0`, `iwctl device list` shows its name.
 5. Run `poweroff`.
 6. Once the laptop is off, remove the USB and turn the laptop back on.
 
-## 3. Install the desktop
+## 3. Run the setup script
 
-You boot to a text login. Log in as your user and connect to Wi-Fi:
-
-```sh
-nmcli device wifi connect '<network>' --ask
-```
-
-Then install one desktop:
-
-- **Dux:** run its installer, see the [Dux installation docs](https://duxlabs.dev/docs/dms/installation).
-- **Hyprland and Noctalia:**
-
-  ```sh
-  curl -fsSL https://raw.githubusercontent.com/adaspt/arch-dotfiles/main/setup-hyprland-noctalia.sh | bash
-  ```
-
-  It installs Hyprland, Noctalia and the Noctalia login screen, copies the login screen and power
-  button config to `/etc`, and links the Hyprland and Noctalia config into `~`.
-
-Then reboot:
-
-```sh
-sudo reboot
-```
-
-## 4. Run the setup script
-
-Log in to the desktop, open a terminal (**Super+T** on Hyprland) and run:
+You boot to the GNOME login screen. Log in, connect to Wi-Fi from the menu at the top right, then
+open a terminal (press **Super**, type `ghostty`) and run:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/adaspt/arch-dotfiles/main/setup.sh | bash
@@ -81,17 +50,14 @@ It asks for your sudo password. It first:
 - clones this repo to `~/Projects/personal/arch-dotfiles`
 - sets up Snapper snapshots of `/`, with automatic cleanup of old ones
 - updates the system and installs zsh with its plugins, CLI tools, `age`, `pacman-contrib`, `fwupd`,
-  Nautilus, Text Editor, Loupe, mpv, qBittorrent and Codex
-- copies the PAM config that unlocks the keyring at the login screen to `/etc`
+  mpv, qBittorrent and Codex
 - enables timers for SSD TRIM, pacman cache cleanup and a monthly btrfs scrub
 - installs paru, then Google Chrome, VS Code, powerlevel10k, the OneDrive client and T3 Code from the AUR
 - installs Claude Code with its own installer, so it updates itself
 - sets the full name on your user account and makes zsh your shell
 - enables linger, so tmux sessions and OneDrive keep running after you log out
 - links the config files in `config/home/` into `~`
-- creates the home folders (Downloads, Documents, ...)
 - sets Loupe as the default app for images, and mpv for video and audio
-- tells VS Code to keep secrets in the keyring, as it only finds it by itself on GNOME and KDE
 - enables the SSH agent
 
 Then it:
@@ -107,8 +73,7 @@ That second half needs the desktop session because the login screen unlocks the 
 text login, the script stops before it. Keep your keyring password the same as your login password.
 Your SSH key passphrases are saved in the keyring the first time you use each key.
 
-The script is safe to run again, from `~/Projects/personal/arch-dotfiles/setup.sh`. After changing a
-file in `config/etc/`, run it to copy the file to `/etc`.
+The script is safe to run again, from `~/Projects/personal/arch-dotfiles/setup.sh`.
 
 ## Development tools
 
@@ -156,7 +121,7 @@ fwupdmgr update
 
 ## If something breaks
 
-- **Ctrl+Alt+F2** opens a text login, where you can fix things.
-- `journalctl -u greetd -b` shows login screen errors (both the Noctalia and the Dux login screens run on greetd). Hyprland logs to `$XDG_RUNTIME_DIR/hypr/*/hyprland.log`.
-- `sudo systemctl disable greetd` and a reboot take you back to the text login. From there you can start Hyprland with `start-hyprland`.
+- **Ctrl+Alt+F3** opens a text login, where you can fix things.
+- `journalctl -b -u gdm` shows login screen errors. `journalctl --user -b` shows the GNOME session's.
+- `sudo systemctl disable gdm` and a reboot take you back to the text login.
 - Snapper takes a snapshot before and after every pacman or paru run. `sudo snapper -c root list` lists them, and `sudo snapper -c root undochange 41..42` undoes the changes of one update.
