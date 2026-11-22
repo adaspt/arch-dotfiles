@@ -105,8 +105,8 @@ export DOTNET_WATCH_PROCESS_CLEANUP_TIMEOUT_MS=1000
 
 
 # ---------- Theme ----------
-[[ -f /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme ]] &&
-  source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+[[ ! -f ~/.local/share/powerlevel10k/powerlevel10k.zsh-theme ]] ||
+  source ~/.local/share/powerlevel10k/powerlevel10k.zsh-theme
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 

@@ -70,7 +70,16 @@ system_setup() {
         rm -rf "$build_dir"
     fi
     paru -S --needed --noconfirm --skipreview \
-        google-chrome visual-studio-code-bin zsh-theme-powerlevel10k onedrive-abraunegg t3code-bin
+        google-chrome visual-studio-code-bin onedrive-abraunegg t3code-bin
+
+    # Cloned, not the AUR package, which compiles gitstatusd; p10k downloads a prebuilt one
+    echo "==> Installing Powerlevel10k"
+    local p10k_dir="$HOME/.local/share/powerlevel10k"
+    if [[ -d "$p10k_dir/.git" ]]; then
+        git -C "$p10k_dir" pull --ff-only || echo "Couldn't update $p10k_dir, keeping it as it is."
+    else
+        git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$p10k_dir"
+    fi
 
     # The native installer, as it updates itself
     echo "==> Installing Claude Code"
