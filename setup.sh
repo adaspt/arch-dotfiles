@@ -159,7 +159,7 @@ onedrive_setup() {
 }
 
 restore_from_onedrive() {
-    local backup="$HOME/OneDrive/Backup" wallpaper="winter-mountain-3840x2160-24311.jpg" key
+    local backup="$HOME/OneDrive/Backup" wallpapers="$HOME/Pictures/Wallpapers" key
 
     if [[ ! -f "$HOME/.ssh/id_ed25519" ]]; then
         unlock_secrets
@@ -186,13 +186,13 @@ restore_from_onedrive() {
         fc-cache -f
     fi
 
-    # Copied, so it stays if the original is moved or deleted
-    if [[ -f "$backup/$wallpaper" ]]; then
-        echo "==> Setting the wallpaper from OneDrive"
-        mkdir -p "$HOME/Pictures/Wallpapers"
-        cp "$backup/$wallpaper" "$HOME/Pictures/Wallpapers/"
+    # Copied, so they stay if the originals are moved or deleted
+    if [[ -d "$backup/wallpapers" ]]; then
+        echo "==> Copying wallpapers from OneDrive and setting arch-01.png"
+        mkdir -p "$wallpapers"
+        cp -r "$backup/wallpapers/." "$wallpapers/"
         for key in picture-uri picture-uri-dark; do
-            gsettings set org.gnome.desktop.background "$key" "file://$HOME/Pictures/Wallpapers/$wallpaper"
+            gsettings set org.gnome.desktop.background "$key" "file://$wallpapers/arch-01.png"
         done
     fi
 }

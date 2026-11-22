@@ -34,7 +34,7 @@ Arch Linux with GNOME on a Framework laptop (Intel).
    It installs the packages and apps, applies the GNOME settings, then signs in to OneDrive (open
    the link in Chrome, sign in, paste the address of the blank page you land on). From OneDrive's
    `Backup/` it restores the SSH keys and the `agersi-vpn` WireGuard VPN (asking for the secrets
-   passphrase), the fonts and the wallpaper. Log out and back in afterwards.
+   passphrase), the fonts and the wallpapers. Log out and back in afterwards.
 
    Keep your keyring password the same as your login password, so the login screen unlocks it. It's
    safe to run again, from `~/Projects/personal/arch-dotfiles/setup.sh`.
