@@ -57,6 +57,10 @@ system_setup() {
     # Copied, not linked, as files in /etc have to be owned by root
     echo "==> Copying config/etc to /etc: login screen settings and monitor layout"
     sudo cp -r "$REPO_DIR/config/etc/." /etc/
+    local form=desktop
+    if compgen -G "/sys/class/power_supply/BAT*" >/dev/null; then form=laptop; fi
+    echo "==> Setting idle suspend for a $form"
+    sudo install -Dm644 "$REPO_DIR/config/power/$form" /etc/dconf/db/gdm.d/00-power
     sudo dconf update  # compiles dconf/db/gdm.d for the login screen
     sudo systemctl daemon-reload
     sudo systemctl enable --now "gdm-monitors@$USER.path"
@@ -133,7 +137,7 @@ gnome_setup() {
     echo "==> Applying config/gnome.ini"
     dconf load / < "$REPO_DIR/config/gnome.ini"
     # The login screen's settings apply to your session too
-    cat "$REPO_DIR"/config/etc/dconf/db/gdm.d/* | dconf load /
+    cat /etc/dconf/db/gdm.d/* | dconf load /
 
     # "Preserve Battery Health" in Settings > Power, kept by UPower rather than dconf
     echo "==> Limiting battery charge, where supported"

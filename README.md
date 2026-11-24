@@ -1,15 +1,11 @@
 # arch-dotfiles
 
-Arch Linux with GNOME on a Framework laptop (Intel) and a ThinkPad P14s Gen 4.
+Arch Linux with GNOME on a Framework laptop, a ThinkPad P14s Gen 4 and a desktop with an NVIDIA
+GTX 1660 Super.
 
-- `archinstall.json`: the archinstall config, which installs GNOME
-- `setup.sh`: everything after archinstall; `setup-dev.sh`, `setup-gaming.sh` and
-  `setup-lenovo.sh` add to it by hand
-- `config/gnome.ini`: GNOME settings, loaded with `dconf load` on every run of `setup.sh`
+- `config/gnome.ini`: GNOME settings, loaded with `dconf load` by `setup.sh`
 - `config/etc/`: copied to `/etc`
-- `config/lenovo/`: copied to `/` by `setup-lenovo.sh`, on the ThinkPad only
 - `config/home/`: symlinked into `~`, so editing the files in `~` edits the repo
-- `config/onedrive/`: OneDrive client config, copied once to `~/.config/onedrive`
 
 ## Install
 
@@ -20,56 +16,57 @@ Arch Linux with GNOME on a Framework laptop (Intel) and a ThinkPad P14s Gen 4.
    ```
 
 2. Run archinstall. Under **Authentication**, add one user as superuser. The install **wipes
-   `/dev/nvme0n1`**. Don't chroot into the new system at the end; `poweroff`, remove the USB and
-   turn the laptop on.
+   `/dev/nvme0n1`**; check with `lsblk` that it's the right disk. Don't chroot into the new system
+   at the end; `poweroff`, remove the USB and turn the PC on.
 
    ```sh
    archinstall --config-url https://raw.githubusercontent.com/adaspt/arch-dotfiles/main/archinstall.json
    ```
 
-3. Log in to GNOME, connect to Wi-Fi, open Ghostty and run:
+3. Log in to GNOME, connect to the network, open Ghostty and run:
 
    ```sh
    curl -fsSL https://raw.githubusercontent.com/adaspt/arch-dotfiles/main/setup.sh | bash
    ```
 
-   It installs the packages and apps, applies the GNOME settings, then signs in to OneDrive (open
-   the link in Chrome, sign in, paste the address of the blank page you land on). From OneDrive's
-   `Backup/` it restores the SSH keys and the `agersi-vpn` WireGuard VPN (asking for the secrets
-   passphrase), the fonts and the wallpapers. Log out and back in afterwards.
+   It asks you to sign in to OneDrive: open the link in Chrome, sign in, paste the address of the
+   blank page you land on. Then it asks for the secrets passphrase. Log out and back in afterwards.
 
-   Keep your keyring password the same as your login password, so the login screen unlocks it. It's
-   safe to run again, from `~/Projects/personal/arch-dotfiles/setup.sh`.
+   Keep your keyring password the same as your login password, so the login screen unlocks it.
 
-4. Optionally, on machines that need them:
+4. Then, from `~/Projects/personal/arch-dotfiles`, the scripts this machine needs:
 
-   - `setup-dev.sh`: .NET SDK 10 with ASP.NET Core and `dotnet ef`, Azure CLI, Azure Functions Core
-     Tools, Node.js 24 with nvm
-   - `setup-gaming.sh`: Steam, and GeForce NOW as a user flatpak
-   - `setup-lenovo.sh`: on the ThinkPad P14s Gen 4, names it `adas-lenovo`, switches off its
-     defective NVIDIA GPU, stops USB from waking it from suspend and uses the `xe` graphics driver
-     instead of `i915`. Restart afterwards
+   - ThinkPad: `./setup-lenovo.sh`, then restart
+   - Desktop: `./setup-desktop.sh`, then restart
+   - `./setup-dev.sh`: .NET, Azure CLI, Node.js
+   - `./setup-gaming.sh`: Steam and GeForce NOW. On the desktop, after `setup-desktop.sh`
 
-## Secrets archive
+All scripts are safe to run again, e.g. after changing the repo.
 
-`Backup/secrets.tar.gz.age` holds `ssh/` (what goes into `~/.ssh`; its `config` holds the hosts and
-is saved as `~/.ssh/config.local`, so they stay out of this public repo) and `agersi-vpn.conf`. To
-update it:
+## Troubleshooting
 
-```sh
-mkdir -p ~/secrets/ssh && cd ~/secrets
-cp ~/.ssh/id_* ~/.ssh/known_hosts ssh/
-cp ~/.ssh/config.local ssh/config
-cp /path/to/agersi-vpn.conf .
-tar -czf - ssh agersi-vpn.conf | age --passphrase --armor -o ~/OneDrive/Backup/secrets.tar.gz.age
-cd ~ && rm -rf ~/secrets
-```
+- **Ctrl+Alt+F3** opens a text login. `journalctl -b -u gdm` shows login screen errors,
+  `journalctl --user -b` the GNOME session's, and `sudo systemctl disable gdm` boots to text
+- OneDrive: `journalctl --user -u onedrive -f`
+- Undo an update: `sudo snapper -c root list` lists the snapshots taken on every pacman and paru
+  run, `sudo snapper -c root undochange 41..42` undoes one
+- Desktop: `nvidia-smi` should show the GTX 1660 SUPER
+- ThinkPad: `lspci -k -d 8086::0300` should show `Kernel driver in use: xe`, and `lspci -d 10de:`
+  nothing. Back to `i915`: `sudo rm /etc/cmdline.d/xe.conf && sudo mkinitcpio -P`, then restart
 
 ## Maintenance
 
 - Firmware updates: `fwupdmgr refresh && fwupdmgr update`
 - VPN: `nmcli connection up agersi-vpn`; it doesn't connect by itself
-- Snapper snapshots every pacman and paru run: `sudo snapper -c root list` lists them,
-  `sudo snapper -c root undochange 41..42` undoes one update
-- **Ctrl+Alt+F3** opens a text login. `journalctl -b -u gdm` shows login screen errors,
-  `journalctl --user -b` the GNOME session's, and `sudo systemctl disable gdm` boots to text
+- Secrets archive, `Backup/secrets.tar.gz.age` in OneDrive: `ssh/` for `~/.ssh` (its `config` is
+  saved as `~/.ssh/config.local`, keeping the hosts out of this public repo) and `agersi-vpn.conf`.
+  To update it:
+
+  ```sh
+  mkdir -p ~/secrets/ssh && cd ~/secrets
+  cp ~/.ssh/id_* ~/.ssh/known_hosts ssh/
+  cp ~/.ssh/config.local ssh/config
+  cp /path/to/agersi-vpn.conf .
+  tar -czf - ssh agersi-vpn.conf | age --passphrase --armor -o ~/OneDrive/Backup/secrets.tar.gz.age
+  cd ~ && rm -rf ~/secrets
+  ```

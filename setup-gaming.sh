@@ -18,9 +18,11 @@ if ! grep -q '^\[multilib\]' /etc/pacman.conf; then
     grep -q '^\[multilib\]' /etc/pacman.conf || { echo "Couldn't enable multilib in /etc/pacman.conf" >&2; exit 1; }
 fi
 
-# lib32-vulkan-intel is named here, or --noconfirm would pick the NVIDIA driver for Steam
+# Named, or --noconfirm would pick Steam's 32-bit Vulkan driver, maybe for the wrong GPU
+vulkan32=lib32-vulkan-intel
+if pacman -Q nvidia-utils &>/dev/null; then vulkan32=lib32-nvidia-utils; fi
 echo "==> Installing Steam and flatpak"
-sudo pacman -Syu --needed --noconfirm steam lib32-vulkan-intel flatpak
+sudo pacman -Syu --needed --noconfirm steam "$vulkan32" flatpak
 
 # NVIDIA's installer sets it up as a user flatpak. It writes its log to the working directory,
 # so it runs in a temp dir.
