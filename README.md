@@ -59,14 +59,12 @@ All scripts are safe to run again, e.g. after changing the repo.
 
 - Firmware updates: `fwupdmgr refresh && fwupdmgr update`
 - VPN: `nmcli connection up agersi-vpn`; it doesn't connect by itself
-- Secrets archive, `Backup/secrets.tar.gz.age` in OneDrive: `ssh/` for `~/.ssh` (its `config` is
-  saved as `~/.ssh/config.local`, keeping the hosts out of this public repo) and `agersi-vpn.conf`.
-  To update it:
+- Secrets archive, `Backup/secrets.tar.gz.age` in OneDrive: `ssh/`, copied into `~/.ssh` (keys
+  and `config`), and `agersi-vpn.conf`. To update it:
 
   ```sh
   mkdir -p ~/secrets/ssh && cd ~/secrets
-  cp ~/.ssh/id_* ~/.ssh/known_hosts ssh/
-  cp ~/.ssh/config.local ssh/config
+  cp ~/.ssh/id_* ~/.ssh/known_hosts ~/.ssh/config ssh/
   cp /path/to/agersi-vpn.conf .
   tar -czf - ssh agersi-vpn.conf | age --passphrase --armor -o ~/OneDrive/Backup/secrets.tar.gz.age
   cd ~ && rm -rf ~/secrets

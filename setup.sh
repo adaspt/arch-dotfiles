@@ -99,7 +99,7 @@ system_setup() {
     sudo loginctl enable-linger "$USER"
     systemctl --user enable gcr-ssh-agent.socket
 
-    # File by file, so ~/.config and ~/.ssh keep their other files
+    # File by file, so ~/.config keeps its other files
     echo "==> Linking config/home into ~"
     local file rel
     while IFS= read -r -d '' file; do
@@ -177,12 +177,11 @@ onedrive_setup() {
 restore_from_onedrive() {
     local backup="$HOME/OneDrive/Backup" wallpapers="$HOME/Pictures/Wallpapers" key
 
+    mkdir -p "$HOME/.ssh"
     if [[ ! -f "$HOME/.ssh/id_ed25519" ]]; then
         unlock_secrets
-        echo "==> Copying SSH keys"
-        # ~/.ssh/config links to this repo and includes config.local, which holds the hosts
-        find "$SECRETS_DIR/ssh" -mindepth 1 -maxdepth 1 ! -name config -exec cp -r {} "$HOME/.ssh/" \;
-        [[ ! -f "$SECRETS_DIR/ssh/config" ]] || cp "$SECRETS_DIR/ssh/config" "$HOME/.ssh/config.local"
+        echo "==> Copying SSH keys and config"
+        cp -r "$SECRETS_DIR/ssh/." "$HOME/.ssh/"
     fi
     chmod -R go-rwx "$HOME/.ssh"
 
