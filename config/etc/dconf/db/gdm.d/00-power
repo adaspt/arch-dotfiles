@@ -1,0 +1,7 @@
+# Suspend when idle: after 15 minutes on battery, 1 hour plugged in.
+# For the login screen, and setup.sh loads it into your session too
+[org/gnome/settings-daemon/plugins/power]
+sleep-inactive-battery-type='suspend'
+sleep-inactive-battery-timeout=900
+sleep-inactive-ac-type='suspend'
+sleep-inactive-ac-timeout=3600

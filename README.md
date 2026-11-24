@@ -1,11 +1,13 @@
 # arch-dotfiles
 
-Arch Linux with GNOME on a Framework laptop (Intel).
+Arch Linux with GNOME on a Framework laptop (Intel) and a ThinkPad P14s Gen 4.
 
 - `archinstall.json`: the archinstall config, which installs GNOME
-- `setup.sh`: everything after archinstall; `setup-dev.sh` and `setup-gaming.sh` add to it by hand
+- `setup.sh`: everything after archinstall; `setup-dev.sh`, `setup-gaming.sh` and
+  `setup-lenovo.sh` add to it by hand
 - `config/gnome.ini`: GNOME settings, loaded with `dconf load` on every run of `setup.sh`
 - `config/etc/`: copied to `/etc`
+- `config/lenovo/`: copied to `/` by `setup-lenovo.sh`, on the ThinkPad only
 - `config/home/`: symlinked into `~`, so editing the files in `~` edits the repo
 - `config/onedrive/`: OneDrive client config, copied once to `~/.config/onedrive`
 
@@ -44,6 +46,9 @@ Arch Linux with GNOME on a Framework laptop (Intel).
    - `setup-dev.sh`: .NET SDK 10 with ASP.NET Core and `dotnet ef`, Azure CLI, Azure Functions Core
      Tools, Node.js 24 with nvm
    - `setup-gaming.sh`: Steam, and GeForce NOW as a user flatpak
+   - `setup-lenovo.sh`: on the ThinkPad P14s Gen 4, names it `adas-lenovo`, switches off its
+     defective NVIDIA GPU, stops USB from waking it from suspend and uses the `xe` graphics driver
+     instead of `i915`. Restart afterwards
 
 ## Secrets archive
 

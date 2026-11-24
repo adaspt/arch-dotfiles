@@ -55,8 +55,9 @@ system_setup() {
     sudo systemctl enable --now fstrim.timer paccache.timer btrfs-scrub@-.timer
 
     # Copied, not linked, as files in /etc have to be owned by root
-    echo "==> Copying config/etc to /etc, and your monitor layout to the login screen"
+    echo "==> Copying config/etc to /etc: login screen settings and monitor layout"
     sudo cp -r "$REPO_DIR/config/etc/." /etc/
+    sudo dconf update  # compiles dconf/db/gdm.d for the login screen
     sudo systemctl daemon-reload
     sudo systemctl enable --now "gdm-monitors@$USER.path"
     sudo systemctl start "gdm-monitors@$USER.service"
@@ -131,6 +132,8 @@ gnome_setup() {
 
     echo "==> Applying config/gnome.ini"
     dconf load / < "$REPO_DIR/config/gnome.ini"
+    # The login screen's settings apply to your session too
+    cat "$REPO_DIR"/config/etc/dconf/db/gdm.d/* | dconf load /
 
     # "Preserve Battery Health" in Settings > Power, kept by UPower rather than dconf
     echo "==> Limiting battery charge, where supported"

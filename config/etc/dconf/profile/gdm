@@ -1,0 +1,5 @@
+# The login screen's dconf profile: Arch's (/usr/share/dconf/profile/gdm) plus system-db:gdm,
+# so the settings in /etc/dconf/db/gdm.d apply to it
+user-db:user
+system-db:gdm
+file-db:/usr/share/gdm/greeter-dconf-defaults
