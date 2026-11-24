@@ -11,7 +11,7 @@ die() { echo "$*" >&2; exit 1; }
 
 [[ $EUID -ne 0 ]] || die "Run this as your normal user, not root."
 [[ $(</sys/class/dmi/id/product_name) == 21HF* ]] || die "This isn't a ThinkPad P14s Gen 4 (machine type 21HF)."
-[[ -d $REPO_DIR/config/lenovo ]] || die "Run it from the repo: ~/Projects/personal/arch-dotfiles/setup-lenovo.sh"
+[[ -d $REPO_DIR/config/lenovo ]] || die "Run it from the repo: ~/Projects/personal/dotfiles/setup-lenovo.sh"
 
 restart=0 rebuild=0
 

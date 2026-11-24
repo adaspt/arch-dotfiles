@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Everything after archinstall. Run it from a terminal in GNOME, as your normal user:
-#   curl -fsSL https://raw.githubusercontent.com/adaspt/arch-dotfiles/main/setup.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/adaspt/dotfiles/main/setup.sh | bash
 # Safe to run again any time.
 set -euo pipefail
 
-REPO_DIR="$HOME/Projects/personal/arch-dotfiles"
+REPO_DIR="$HOME/Projects/personal/dotfiles"
 
 # Decrypted secrets: on a tmpfs only this user can read, deleted on exit
-SECRETS_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/arch-dotfiles-secrets"
+SECRETS_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/dotfiles-secrets"
 trap 'rm -rf "$SECRETS_DIR" "$SECRETS_DIR.part"' EXIT
 
 die() { echo "$*" >&2; exit 1; }
@@ -29,7 +29,7 @@ main() {
 }
 
 system_setup() {
-    [[ -d "$REPO_DIR/.git" ]] || git clone https://github.com/adaspt/arch-dotfiles.git "$REPO_DIR"
+    [[ -d "$REPO_DIR/.git" ]] || git clone https://github.com/adaspt/dotfiles.git "$REPO_DIR"
 
     # archinstall creates no snapper config, so snap-pac snapshots nothing until this.
     # Before the update, so the update is the first thing snapshotted

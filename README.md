@@ -1,4 +1,4 @@
-# arch-dotfiles
+# dotfiles
 
 Arch Linux with GNOME on a Framework laptop, a ThinkPad P14s Gen 4 and a desktop with an NVIDIA
 GTX 1660 Super.
@@ -20,13 +20,13 @@ GTX 1660 Super.
    at the end; `poweroff`, remove the USB and turn the PC on.
 
    ```sh
-   archinstall --config-url https://raw.githubusercontent.com/adaspt/arch-dotfiles/main/archinstall.json
+   archinstall --config-url https://raw.githubusercontent.com/adaspt/dotfiles/main/archinstall.json
    ```
 
 3. Log in to GNOME, connect to the network, open Ghostty and run:
 
    ```sh
-   curl -fsSL https://raw.githubusercontent.com/adaspt/arch-dotfiles/main/setup.sh | bash
+   curl -fsSL https://raw.githubusercontent.com/adaspt/dotfiles/main/setup.sh | bash
    ```
 
    It asks you to sign in to OneDrive: open the link in Chrome, sign in, paste the address of the
@@ -34,7 +34,7 @@ GTX 1660 Super.
 
    Keep your keyring password the same as your login password, so the login screen unlocks it.
 
-4. Then, from `~/Projects/personal/arch-dotfiles`, the scripts this machine needs:
+4. Then, from `~/Projects/personal/dotfiles`, the scripts this machine needs:
 
    - ThinkPad: `./setup-lenovo.sh`, then restart
    - Desktop: `./setup-desktop.sh`, then restart
