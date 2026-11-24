@@ -50,7 +50,8 @@ All scripts are safe to run again, e.g. after changing the repo.
 - OneDrive: `journalctl --user -u onedrive -f`
 - Undo an update: `sudo snapper -c root list` lists the snapshots taken on every pacman and paru
   run, `sudo snapper -c root undochange 41..42` undoes one
-- Desktop: `nvidia-smi` should show the GTX 1660 SUPER
+- Desktop: `nvidia-smi` should show the GTX 1660 SUPER. `journalctl -u sshd` shows SSH logins and
+  why they were refused
 - ThinkPad: `lspci -k -d 8086::0300` should show `Kernel driver in use: xe`, and `lspci -d 10de:`
   nothing. Back to `i915`: `sudo rm /etc/cmdline.d/xe.conf && sudo mkinitcpio -P`, then restart
 

@@ -21,6 +21,14 @@ if [[ $(hostnamectl hostname) != adas-work ]]; then
     sudo hostnamectl set-hostname adas-work
 fi
 
+# Your key, the same on every machine, logs in without a password; phones and tablets use the password
+echo "==> Starting the SSH server"
+[[ -f ~/.ssh/id_ed25519.pub ]] || die "~/.ssh/id_ed25519.pub not found. Run setup.sh first."
+grep -qxF "$(<~/.ssh/id_ed25519.pub)" ~/.ssh/authorized_keys 2>/dev/null ||
+    cat ~/.ssh/id_ed25519.pub >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+sudo systemctl enable --now sshd
+
 # nvidia-open supports GTX 16xx and newer; libva-nvidia-driver decodes video in browsers
 echo "==> Installing the NVIDIA driver"
 pacman -Q nvidia-open &>/dev/null || restart=1
